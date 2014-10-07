@@ -60,13 +60,21 @@ public class RESTRequest {
 		return filters.toArray(new ResourceFilter[0]);
 	}
 
-	public class ResourceFilter {
+	public static class ResourceFilter {
 		private final String condition;
 		private final String value;
 
 		public ResourceFilter(String condition, String value) {
 			this.condition = condition;
 			this.value = value;
+		}
+
+		public String getCondition() {
+			return condition;
+		}
+
+		public String getValue() {
+			return value;
 		}
 	}
 

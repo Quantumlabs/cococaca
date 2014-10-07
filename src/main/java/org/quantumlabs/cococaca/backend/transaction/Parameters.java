@@ -6,6 +6,7 @@ public class Parameters {
 	public static final String URL_STATIC_HTML_PREFIX = "/static";
 
 	public static final String URL_FILTER_DELIMITER = "?";
+	public static final String URL_FILTER_CONCATENATOR = "&";
 	public static final String HTTP_HEADER_ACCEPT = "Accept";
 
 	// @start Resources locators

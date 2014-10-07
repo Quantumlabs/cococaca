@@ -1,5 +1,7 @@
 package org.quantumlabs.cococaca.backend.service.dispatching;
 
+import java.util.Optional;
+
 import org.quantumlabs.cococaca.backend.service.dispatching.RESTRequest.ResourceFilter;
 
 /**
@@ -16,9 +18,9 @@ public interface IResourceRoutingPolicy {
 	 *      {@link org.quantumlabs.cococaca.backend.transaction.IResourceHandler#accept(String)}
 	 * 
 	 * @param request
-	 *            The bare request string. It could be a URL string.
+	 *            The bare request string.
 	 * 
-	 * @return The resource identifier.
+	 * @return The resource identifier.<strong>Nullable</strong>
 	 * */
 	String extractResourceLocator(RESTRequest request);
 
@@ -31,7 +33,7 @@ public interface IResourceRoutingPolicy {
 	 * @param bareRequest
 	 *            The raw request string. It could be a URL string.
 	 * 
-	 * @return The resource filters.
+	 * @return The resource filters. It could be a URL string.
 	 * */
-	ResourceFilter[] extractResourceFilters(RESTRequest bareRequest);
+	Optional<ResourceFilter[]> extractResourceFilters(RESTRequest bareRequest);
 }

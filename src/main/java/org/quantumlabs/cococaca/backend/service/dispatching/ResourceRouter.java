@@ -4,10 +4,12 @@
 package org.quantumlabs.cococaca.backend.service.dispatching;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.ReadLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
 
+import org.quantumlabs.cococaca.backend.service.dispatching.RESTRequest.ResourceFilter;
 import org.quantumlabs.cococaca.backend.transaction.IResourceHandler;
 
 public class ResourceRouter {
@@ -76,7 +78,10 @@ public class ResourceRouter {
 
 	private void decorate(RESTRequest request) {
 		request.setResourceLocator(policy.extractResourceLocator(request));
-		request.addFilter(policy.extractResourceFilters(request));
+		Optional<ResourceFilter[]> filters = policy.extractResourceFilters(request);
+		if (filters.isPresent()) {
+			request.addFilter();
+		}
 		// TODO Decorate other fields of the request
 	}
 
