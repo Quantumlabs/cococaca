@@ -1,0 +1,115 @@
+<html>
+<head>
+<meta name="viewport"
+	content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title></title>
+<link href="css/bootstrap.min.css" rel="stylesheet" type="text/css">
+<link href="css/style.css" rel="stylesheet" type="text/css">
+<script src="http://code.jquery.com/jquery-1.11.0.min.js"></script>
+<script src="js/bootstrap.min.js"></script>
+<script src="js/stream.html.js"></script>
+
+<!--owl.carousel-start-->
+<link rel="stylesheet" href="css/owl-carousel/owl.carousel.css">
+<link rel="stylesheet" href="css/owl-carousel/owl.theme.css">
+<script src="js/owl-carousel/owl.carousel.min.js"></script>
+<!--owl.carousel-end-->
+</head>
+<body>
+	<div class="container">
+		<div id="header-nav" class="row navbar-fixed-top">
+			<div class="container ">
+				<div class="row">
+					<div class="col-xs-2"></div>
+					<!--<button class="btn btn-warning  col-xs-2  btn-sm">New</button>-->
+					<div class="col-xs-2">
+						<span>Home</span>
+					</div>
+					<div class="col-xs-1"></div>
+					<button class="btn btn-primary  col-xs-2 btn-sm text-center active">New</button>
+					<div class="col-xs-1"></div>
+					<button class="btn btn-warning  col-xs-2 btn-sm">Around</button>
+				</div>
+			</div>
+		</div>
+		<div name="main-container">
+			<div class="row">
+				<div class="col-sm-2"></div>
+				<div class="col-sm-8" name="card-container" id="">
+					<div name="card-header" class="container">
+						<!--@start Car-header  -- for user info and more action menu-->
+
+						<!--@end Car-header  -- for user info and more action menu-->
+						<div class="row">
+							<div class="col-md-2" id="card-header-author-avatar">
+								<a><img class="img-circle img-responsive"
+									src="http://placehold.it/65x65&text=avatar" /></a>
+							</div>
+						</div>
+
+					</div>
+					<div name="card-content-container">
+						<!--@TODO centeralize image-->
+						<div onclick="javascript:card_content_on_click()"
+							data-toggle="modal" data-target="#myModal"
+							name="inner-card-content-container">
+							<img class="img-responsive center-block"
+								src="http://placehold.it/600x600&text=avatar">
+						</div>
+						<div name="card_danmuku_content_container"></div>
+					</div>
+					<div name="card-foot" class="container-fluid">
+						<div class="row">
+							<div class="col-xs-6 pull-right" name="card-foot-statistic">
+								<div class="row">
+									<div name="statistic-comment" class="col-xs-3">
+										<span class="input-lg glyphicon glyphicon-star">like</span>
+									</div>
+									<div name="statistic-like" class="col-xs-3">
+										<span class="input-lg  glyphicon glyphicon-share-alt">repost</span>
+									</div>
+								</div>
+								<div name="statistic-repost" class="col-xs-3">
+									<span class="input-lg  glyphicon glyphicon-upload">share</span>
+								</div>
+							</div>
+							<div name="content-description" class="h3">Hello this is
+								fucking content description,#helloword</div>
+							<div name="show-viewer" class="row">
+								<script>
+									load_commented_users("poster-1");
+								</script>
+							</div>
+							<div class="form-group" name="comment-text-input">
+								<input class="form-control input-lg" type="text"
+									placeholder="Enter email">
+								<button class="input-sm btn btn-primary pull-right">
+									<span name="comment-text-input-btn"
+										class="glyphicon glyphicon-comment"></span>
+								</button>
+							</div>
+						</div>
+
+					</div>
+				</div>
+				<div class="col-sm-2"></div>
+			</div>
+		</div>
+		<div id="footer-nav" class="row navbar-fixed-bottom">
+			<div class="container ">
+				<div class="row">
+					<div class="col-xs-2"></div>
+					<!--<button class="btn btn-warning  col-xs-2  btn-sm">New</button>-->
+					<div class="col-xs-2 ">
+						<span>Home</span>
+					</div>
+					<div class="col-xs-1"></div>
+					<button class="btn btn-primary col-xs-2 btn-sm text-center active">New</button>
+					<div class="col-xs-1"></div>
+					<button class="btn btn-warning  col-xs-2 btn-sm">Around</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</body>
+</html>
