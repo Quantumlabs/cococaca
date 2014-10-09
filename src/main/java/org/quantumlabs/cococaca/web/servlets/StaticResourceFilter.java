@@ -10,8 +10,8 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 
-import org.quantumlabs.cococaca.backend.transaction.Helper;
-import org.quantumlabs.cococaca.backend.transaction.Parameters;
+import org.quantumlabs.cococaca.backend.Helper;
+import org.quantumlabs.cococaca.backend.service.preference.Parameters;
 
 public class StaticResourceFilter implements Filter {
 

@@ -1,15 +1,14 @@
 package org.quantumlabs.cococaca.backend.transaction.response.responseentity;
 
-import org.quantumlabs.cococaca.backend.transaction.response.contenttype.AcceptableResponse;
-import org.quantumlabs.cococaca.backend.transaction.response.contenttype.Json;
+import org.quantumlabs.cococaca.backend.transaction.response.contenttype.JsonResponse;
 
 /**
  * Content-type: vrnd.org.quantumlabs.cococaca.post.v2 +json
  * */
-public class PostResponse implements AcceptableResponse<Json> {
-	
+public class PostResponse implements JsonResponse {
+
 	@Override
-	public Json get() {
+	public String get() {
 		return null;
 	}
 }

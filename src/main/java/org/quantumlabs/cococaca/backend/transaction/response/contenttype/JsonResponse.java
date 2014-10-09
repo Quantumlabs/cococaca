@@ -1,5 +1,5 @@
 package org.quantumlabs.cococaca.backend.transaction.response.contenttype;
 
-public interface Json {
+public interface JsonResponse extends AcceptableResponse {
 	String get();
 }

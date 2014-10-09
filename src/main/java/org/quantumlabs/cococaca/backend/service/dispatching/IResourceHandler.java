@@ -1,6 +1,5 @@
-package org.quantumlabs.cococaca.backend.transaction;
+package org.quantumlabs.cococaca.backend.service.dispatching;
 
-import org.quantumlabs.cococaca.backend.service.dispatching.RESTRequest;
 
 /**
  * Copy right (c) yudzhou since 2014/9/29.

@@ -1,7 +1,7 @@
 package org.quantumlabs.cococaca.backend.service.dispatching;
 
-import static org.quantumlabs.cococaca.backend.transaction.Parameters.URL_FILTER_CONCATENATOR;
-import static org.quantumlabs.cococaca.backend.transaction.Parameters.URL_FILTER_DELIMITER;
+import static org.quantumlabs.cococaca.backend.service.preference.Parameters.URL_FILTER_CONCATENATOR;
+import static org.quantumlabs.cococaca.backend.service.preference.Parameters.URL_FILTER_DELIMITER;
 
 import java.util.ArrayList;
 import java.util.Arrays;

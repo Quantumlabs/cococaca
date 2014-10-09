@@ -3,7 +3,7 @@
  */
 package org.quantumlabs.cococaca.backend.service.dispatching;
 
-import static org.quantumlabs.cococaca.backend.transaction.Parameters.HTTP_HEADER_ACCEPT;
+import static org.quantumlabs.cococaca.backend.service.preference.Parameters.HTTP_HEADER_ACCEPT;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -11,7 +11,7 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.quantumlabs.cococaca.backend.transaction.Helper;
+import org.quantumlabs.cococaca.backend.Helper;
 
 public class RESTRequest {
 	private final HttpServletRequest request;

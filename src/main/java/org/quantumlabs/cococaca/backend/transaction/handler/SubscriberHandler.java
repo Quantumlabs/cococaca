@@ -1,16 +1,16 @@
 package org.quantumlabs.cococaca.backend.transaction.handler;
 
-import static org.quantumlabs.cococaca.backend.transaction.Parameters.URL_SUBSCRIBER_PLURAL_LOCATOR;
-import static org.quantumlabs.cococaca.backend.transaction.Parameters.URL_SUBSCRIBER_SINGULAR_LOCATOR;
+import static org.quantumlabs.cococaca.backend.service.preference.Parameters.URL_SUBSCRIBER_PLURAL_LOCATOR;
+import static org.quantumlabs.cococaca.backend.service.preference.Parameters.URL_SUBSCRIBER_SINGULAR_LOCATOR;
 
 import java.util.Optional;
 
 import org.quantumlabs.cococaca.backend.service.TXNManager;
+import org.quantumlabs.cococaca.backend.service.dispatching.IResourceHandler;
+import org.quantumlabs.cococaca.backend.service.dispatching.IResourceHandlerCallBack;
 import org.quantumlabs.cococaca.backend.service.dispatching.RESTRequest;
 import org.quantumlabs.cococaca.backend.service.persistence.model.ISubscriberKey;
 import org.quantumlabs.cococaca.backend.service.persistence.model.Subscriber;
-import org.quantumlabs.cococaca.backend.transaction.IResourceHandler;
-import org.quantumlabs.cococaca.backend.transaction.IResourceHandlerCallBack;
 import org.quantumlabs.cococaca.backend.transaction.response.responseentity.SubscriberResponse;
 
 public class SubscriberHandler implements IResourceHandler {

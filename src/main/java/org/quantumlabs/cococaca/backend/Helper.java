@@ -1,9 +1,11 @@
-package org.quantumlabs.cococaca.backend.transaction;
+package org.quantumlabs.cococaca.backend;
 
 import java.util.Objects;
 
 import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
+
+import org.quantumlabs.cococaca.backend.service.preference.Parameters;
 
 public class Helper {
 

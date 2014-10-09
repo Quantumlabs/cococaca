@@ -10,7 +10,6 @@ import java.util.concurrent.locks.ReentrantReadWriteLock.ReadLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
 
 import org.quantumlabs.cococaca.backend.service.dispatching.RESTRequest.ResourceFilter;
-import org.quantumlabs.cococaca.backend.transaction.IResourceHandler;
 
 public class ResourceRouter {
 	private List<IResourceHandler> handlerRegistry;

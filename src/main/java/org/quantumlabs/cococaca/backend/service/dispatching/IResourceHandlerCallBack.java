@@ -1,6 +1,5 @@
-package org.quantumlabs.cococaca.backend.transaction;
+package org.quantumlabs.cococaca.backend.service.dispatching;
 
-import org.quantumlabs.cococaca.backend.service.dispatching.RESTRequest;
 import org.quantumlabs.cococaca.backend.transaction.response.contenttype.AcceptableResponse;
 
 /**
@@ -8,7 +7,7 @@ import org.quantumlabs.cococaca.backend.transaction.response.contenttype.Accepta
  */
 public interface IResourceHandlerCallBack {
 
-	void onResouceHandlingCompleted(RESTRequest request, AcceptableResponse<?> response);
+	void onResouceHandlingCompleted(RESTRequest request, AcceptableResponse response);
 
 	void onResourceHandlingFailed(RESTRequest request, Object attachment);
 }

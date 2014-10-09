@@ -2,12 +2,12 @@ package org.quantumlabs.cococaca.backend.transaction.response.responseentity;
 
 import org.quantumlabs.cococaca.backend.service.persistence.model.Subscriber;
 import org.quantumlabs.cococaca.backend.transaction.response.contenttype.AcceptableResponse;
-import org.quantumlabs.cococaca.backend.transaction.response.contenttype.Json;
+import org.quantumlabs.cococaca.backend.transaction.response.contenttype.JsonResponse;
 
 /**
  * vrnd.org.quantumlabs.cococaca.user.v2 +json
  * */
-public class SubscriberResponse implements AcceptableResponse<Json> {
+public class SubscriberResponse implements JsonResponse {
 	private Subscriber subscriber;
 
 	public SubscriberResponse(Subscriber subscriber) {
@@ -15,14 +15,14 @@ public class SubscriberResponse implements AcceptableResponse<Json> {
 	}
 
 	@Override
-	public Json get() {
+	public String get() {
 		return buildAcceptableJson(subscriber);
 	}
 
 	// content-type -> vrnd.org.quantumlabs.cococaca.user.v2+json @see
 	// REST-API-BETA-V2
 	// {avatar:<avatar-ID>, follower:[<follower-1-ID>,<follower-2-ID>...], ...}
-	private Json buildAcceptableJson(Subscriber subscriber) {
+	private String buildAcceptableJson(Subscriber subscriber) {
 		// TODO
 		return null;
 	}

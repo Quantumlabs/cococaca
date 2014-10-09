@@ -6,11 +6,11 @@ import java.io.Writer;
 
 import javax.servlet.http.HttpServletResponse;
 
+import org.quantumlabs.cococaca.backend.service.dispatching.IResourceHandlerCallBack;
 import org.quantumlabs.cococaca.backend.service.dispatching.RESTRequest;
-import org.quantumlabs.cococaca.backend.transaction.IResourceHandlerCallBack;
 import org.quantumlabs.cococaca.backend.transaction.response.contenttype.AcceptableResponse;
-import org.quantumlabs.cococaca.backend.transaction.response.contenttype.Binary;
-import org.quantumlabs.cococaca.backend.transaction.response.contenttype.Json;
+import org.quantumlabs.cococaca.backend.transaction.response.contenttype.BinaryReponse;
+import org.quantumlabs.cococaca.backend.transaction.response.contenttype.JsonResponse;
 
 public class HTTPServletResponseBasedCallBack implements IResourceHandlerCallBack {
 	private final HttpServletResponse resp;
@@ -26,21 +26,21 @@ public class HTTPServletResponseBasedCallBack implements IResourceHandlerCallBac
 	}
 
 	@Override
-	public void onResouceHandlingCompleted(RESTRequest request, AcceptableResponse<?> response) {
-		writeToResponse(response.get());
+	public void onResouceHandlingCompleted(RESTRequest request, AcceptableResponse response) {
+		writeToResponse(response);
 	}
 
-	private void writeToResponse(Object contentData) {
+	private void writeToResponse(AcceptableResponse acceptableResponse) {
 		AutoCloseable closableOutputChannel = null;
 		try {
-			if (contentData instanceof Json) {
+			if (acceptableResponse instanceof JsonResponse) {
 				closableOutputChannel = resp.getWriter();
-				((Writer) closableOutputChannel).write(Json.class.cast(contentData).get());
-			} else if (contentData instanceof Binary) {
+				((Writer) closableOutputChannel).write(JsonResponse.class.cast(acceptableResponse).get());
+			} else if (acceptableResponse instanceof BinaryReponse) {
 				closableOutputChannel = resp.getOutputStream();
-				((OutputStream) closableOutputChannel).write(Binary.class.cast(contentData).get());
+				((OutputStream) closableOutputChannel).write(BinaryReponse.class.cast(acceptableResponse).get());
 			} else {
-				throw new RuntimeException(String.format("Unsupported data content-type so for %s", contentData));
+				throw new RuntimeException(String.format("Unsupported data content-type so for %s", acceptableResponse));
 			}
 		} catch (IOException e) {
 			handleEx(e);

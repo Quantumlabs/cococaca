@@ -15,7 +15,7 @@ public interface IResourceRoutingPolicy {
 	 * processed by the <code>IResourceHandler</code> if is accepted by it.
 	 * 
 	 * @see {@link ResourceRouter#decorateAndRoute(RESTRequest)}
-	 *      {@link org.quantumlabs.cococaca.backend.transaction.IResourceHandler#accept(String)}
+	 *      {@link org.quantumlabs.cococaca.backend.service.dispatching.IResourceHandler#accept(String)}
 	 * 
 	 * @param request
 	 *            The bare request string.

@@ -1,4 +1,4 @@
-package org.quantumlabs.cococaca.backend.transaction;
+package org.quantumlabs.cococaca.backend.service.preference;
 
 public class Parameters {
 	public static final String CONTENT_TYPE_VRND_QLBS_COCA_USR_V2_JSN_FMT = "vrnd.org.quantumlabs.cococaca.user.v2+json";
@@ -15,4 +15,5 @@ public class Parameters {
 	public static final String URL_POST_SINGULAR_LOCATOR = " /Post";
 	public static final String URL_POST_PLURAL_LOCATOR = " /Posts";
 	// @end Resources locators
+	public static final String CONFIG_PERSISTENCE_TYPE = "org.quantumlabs.cococaca.persistence.type";
 }
