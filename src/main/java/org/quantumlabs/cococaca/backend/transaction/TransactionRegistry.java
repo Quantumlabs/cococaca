@@ -14,6 +14,10 @@ public class TransactionRegistry implements StartCallBack {
 		this.router = resourceRouter;
 	}
 
+	/**
+	 * Any resource handler should be registered to router in the
+	 * <code>callBack</code> method.
+	 * */
 	@Override
 	public void callBack(BackEnd event) {
 		router.register(new SubscriberHandler());

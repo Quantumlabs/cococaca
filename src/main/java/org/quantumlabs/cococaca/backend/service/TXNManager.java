@@ -32,9 +32,4 @@ public class TXNManager {
 	public ResourceRouter getResourceRouter() {
 		return null;
 	}
-
-	public void init() {
-		// TODO Auto-generated method stub
-
-	}
 }

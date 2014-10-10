@@ -11,19 +11,24 @@ public class BackEnd {
 	private List<CallBack<BackEnd, Void>> stopCallBacks;
 
 	public void start() {
-		// TODO Starting staffs
+		doStart();
 		notifyCallBacks(startCallBacks, this);
+	}
+
+	private void doStart() {
+		// TODO Starting staffs, e.g. initializing system services. etc.
+		initializeSystem();
+		registerDefaultHooks();
+	}
+
+	private void initializeSystem() {
+		TXNManager.getInstance().initialize();
 	}
 
 	private void notifyCallBacks(List<CallBack<BackEnd, Void>> callBacks, BackEnd event) {
 		for (CallBack<BackEnd, Void> callBack : callBacks) {
 			callBack.callBack(event);
 		}
-	}
-
-	public void init() {
-		TXNManager.getInstance().init();
-		registerDefaultHooks();
 	}
 
 	private void registerDefaultHooks() {
@@ -55,7 +60,6 @@ public class BackEnd {
 
 	public static void main(String[] args) {
 		BackEnd backEnd = new BackEnd();
-		backEnd.init();
 		backEnd.start();
 	}
 }

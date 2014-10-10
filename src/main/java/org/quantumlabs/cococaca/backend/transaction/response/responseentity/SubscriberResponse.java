@@ -1,7 +1,6 @@
 package org.quantumlabs.cococaca.backend.transaction.response.responseentity;
 
 import org.quantumlabs.cococaca.backend.service.persistence.model.Subscriber;
-import org.quantumlabs.cococaca.backend.transaction.response.contenttype.AcceptableResponse;
 import org.quantumlabs.cococaca.backend.transaction.response.contenttype.JsonResponse;
 
 /**
