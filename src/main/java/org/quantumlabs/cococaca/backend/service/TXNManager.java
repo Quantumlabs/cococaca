@@ -16,8 +16,8 @@ public class TXNManager {
 	 * and re-initialization are both needed.
 	 * */
 	public void initialize() {
-		Config config = new PreferenceConfig();
-		persistence = PersistenceFactory.getInstance().getPersistence(config);
+        Config config = new PreferenceConfig();
+        persistence = PersistenceFactory.getInstance().getPersistence(config);
 	}
 
 	public static TXNManager getInstance() {

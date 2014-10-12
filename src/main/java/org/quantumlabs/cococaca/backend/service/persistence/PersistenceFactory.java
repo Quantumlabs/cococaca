@@ -12,7 +12,7 @@ public class PersistenceFactory {
 		IPersistence candidatePersistence;
 		switch (persistenceType) {
 		case _SUPPORTED_PERSISTENCE_TYPE_MYSQL:
-			candidatePersistence = new IPersistenceMysqlImpl();
+			candidatePersistence = new IPersistenceMysqlImpl(config);
 			candidatePersistence.start();
 			break;
 		default:
