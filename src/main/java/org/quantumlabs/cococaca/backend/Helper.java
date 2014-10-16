@@ -2,7 +2,6 @@ package org.quantumlabs.cococaca.backend;
 
 import java.util.Objects;
 
-import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
 
 import org.quantumlabs.cococaca.backend.service.preference.Parameters;
@@ -52,5 +51,25 @@ public class Helper {
 		if (!(Objects.nonNull(o))) {
 			throw new AssertionError("Null is not allowed.");
 		}
+	}
+
+	public static void isNotEmptyString(String string) {
+		assertNotNull(string);
+		if (string.length() == 0) {
+			throw new AssertionError("Empty String.");
+		}
+	}
+
+	public static void logError(Exception e) {
+		StringBuilder builder = new StringBuilder();
+		for (StackTraceElement stackElement : e.getStackTrace()) {
+			builder.append(stackElement.toString());
+			builder.append("\n");
+		}
+		log(builder.toString());
+	}
+
+	private static void log(String string) {
+		System.out.println(string);
 	}
 }

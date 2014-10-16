@@ -9,13 +9,15 @@ import org.quantumlabs.cococaca.backend.service.persistence.model.Subscriber;
  * Copy right (c) yudzhou since 2014/9/29.
  */
 public interface IPersistence {
-    Subscriber fetchSubscriber(ISubscriberKey subscriberKey);
+	Subscriber fetchSubscriber(ISubscriberKey subscriberKey);
 
-    Post fetchPost(IPostKey postKey);
+	Post fetchPost(IPostKey postKey);
 
-    void start();
+	void start();
 
-    void stop();
+	void stop();
 
-    boolean isStarted();
+	boolean isStarted();
+
+	void storeSubscriber(Subscriber subscriber, String password);
 }

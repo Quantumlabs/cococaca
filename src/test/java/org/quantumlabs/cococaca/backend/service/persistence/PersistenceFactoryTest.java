@@ -3,6 +3,7 @@ package org.quantumlabs.cococaca.backend.service.persistence;
 import org.junit.Assert;
 import org.junit.Test;
 import org.quantumlabs.cococaca.backend.service.persistence.PersistenceFactory.NotSupportedPersistenceTypeException;
+import org.quantumlabs.cococaca.backend.service.persistence.mock.UTPersistenceConfig;
 import org.quantumlabs.cococaca.backend.service.preference.Config;
 import org.quantumlabs.cococaca.backend.service.preference.Parameters;
 
@@ -13,8 +14,7 @@ public class PersistenceFactoryTest {
 	@Test
 	public void testGetPersistenceByPolicy() {
 		PersistenceFactory fatory = new PersistenceFactory();
-		Config config = mock(Config.class);
-		when(config.get(Parameters.CONFIG_PERSISTENCE_TYPE)).thenReturn("mysql");
+		Config config = new UTPersistenceConfig();
 		IPersistence persistence = fatory.getPersistence(config);
 		Assert.assertNotNull(persistence);
 		Assert.assertTrue(persistence.isStarted());
