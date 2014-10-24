@@ -4,11 +4,13 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import org.junit.After;
 import org.junit.AfterClass;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.quantumlabs.cococaca.backend.UnitTestUtil;
-import org.quantumlabs.cococaca.backend.service.persistence.mock.UTPersistenceConfig;
+import org.quantumlabs.cococaca.backend.service.persistence.mock.UTPresistenceConfig;
 import org.quantumlabs.cococaca.backend.service.persistence.model.Gender;
 import org.quantumlabs.cococaca.backend.service.persistence.model.ISubscriberKey;
 import org.quantumlabs.cococaca.backend.service.persistence.model.Subscriber;
@@ -17,13 +19,15 @@ import org.quantumlabs.cococaca.backend.service.preference.Config;
 public class IPersistenceMysqImplTest {
 	private IPersistence persistence;
 
-	@BeforeClass
+	@Before
 	public static void beforeClass() {
+		UnitTestUtil.setupDBEnv();
+		UnitTestUtil.tearDownDBEnv();
 	}
 
-	@AfterClass
+	@After
 	public static void afterClass() {
-		// UnitTestUtil.tearDownDBForUnitTest();
+		UnitTestUtil.tearDownDBEnv();
 	}
 
 	@Test
@@ -44,7 +48,7 @@ public class IPersistenceMysqImplTest {
 	}
 
 	private void preparePersistence() {
-		Config mockConfig = new UTPersistenceConfig();
+		Config mockConfig = new UTPresistenceConfig();
 		persistence = new IPersistenceMysqlImpl(mockConfig);
 	}
 
@@ -62,6 +66,11 @@ public class IPersistenceMysqImplTest {
 		assertEquals("_avatarID", fetchedSubscriber.getAvatarID());
 		assertEquals(Gender.MALE, fetchedSubscriber.getGender());
 		assertEquals("_john", fetchedSubscriber.getName());
-		UnitTestUtil.clearAllTables();
+	}
+
+	public void testInsertSubscriber() {
+	}
+
+	public void testUpdateSubscriber() {
 	}
 }

@@ -5,10 +5,10 @@ import java.util.Properties;
 
 import org.quantumlabs.cococaca.backend.service.preference.Config;
 
-public class UTPersistenceConfig implements Config {
+public class UTPresistenceConfig implements Config {
 	private final Properties properties = new Properties();
 
-	public UTPersistenceConfig() {
+	public UTPresistenceConfig() {
 		try (InputStream utConfigFileInputStream = ClassLoader.getSystemClassLoader().getResourceAsStream(
 				"cococaca-preference.properties")) {
 			properties.load(utConfigFileInputStream);
