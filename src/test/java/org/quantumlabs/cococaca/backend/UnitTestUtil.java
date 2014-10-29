@@ -5,24 +5,24 @@ import static org.quantumlabs.cococaca.backend.service.preference.Parameters.CON
 import static org.quantumlabs.cococaca.backend.service.preference.Parameters.CONFIG_PERSISTENCE_DB_URL;
 import static org.quantumlabs.cococaca.backend.service.preference.Parameters.CONFIG_PERSISTENCE_DB_USERNAME;
 
-import java.io.IOException;
+import java.io.File;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
 
+import org.hsqldb.cmdline.SqlFile;
 import org.quantumlabs.cococaca.backend.service.persistence.mock.UTPresistenceConfig;
 import org.quantumlabs.cococaca.backend.service.preference.Config;
 
 public class UnitTestUtil {
+	private static final String workingDir = System.getenv("user.dir");
+	private static final String testResourcesDir = workingDir + "/src/resources";
+	private static final String DB_SCHEMA_INIT_SQL_FILE_PATH = testResourcesDir + "/db/initialization.sql";
+	private static final String DB_SCHEMA_UNINIT_SQL_FILE_PATH = testResourcesDir + "/db/uninitialization.sql";
 	private static final String DROP_UT_DATABASE_IF_EXISTS = "DROP DATABASE IF EXISTS cococaca";
-	private static final Runtime commandRunner = Runtime.getRuntime();
-	private static final String _INITIALIZATION_COMMAND = String.format("mysql --user=root --password=\"\" < %s",
-			"db\\initialization.sql");
-	private static final String _UNINITIALIZATION_COMMAND = String.format("mysql --user=root --password=\"\" < %s",
-			"db\\uninitialization.sql");
 
 	private static Config utConfig = new UTPresistenceConfig();
 
@@ -31,48 +31,56 @@ public class UnitTestUtil {
 	}
 
 	private static void setupSchema() {
-		executeCommand(_INITIALIZATION_COMMAND);
+		executeSQLFromFile(new File(DB_SCHEMA_INIT_SQL_FILE_PATH));
 	}
 
 	public static void tearDownDBEnv() {
-		dropDatabase();
+		executeSQLFromFile(new File(DB_SCHEMA_UNINIT_SQL_FILE_PATH));
 	}
 
 	private static void dropDatabase() {
 		executeSQL(DROP_UT_DATABASE_IF_EXISTS);
 	}
 
-	@Deprecated
-	private static void executeCommand(String command) {
-		try {
-			Process process = commandRunner.exec(command);
-			boolean success = process.waitFor(5, TimeUnit.SECONDS);
-			if (!success) {
-				throw new RuntimeException(String.format("Time out for executing command %s", command));
+	public static void executeSQLFromFile(File file) {
+		executeDBOperation((connection) -> {
+			try {
+				SqlFile sqlFile = new SqlFile(file);
+				sqlFile.setConnection(connection);
+				sqlFile.execute();
+				return null;
+			} catch (Exception e) {
+				throw new RuntimeException(e);
 			}
-			int returnCode = process.exitValue();
-			if (returnCode != 0) {
-				throw new RuntimeException(String.format("Return code %s by executing command %S", returnCode, command));
-			}
-		} catch (InterruptedException | IOException e) {
-			throw new RuntimeException(String.format("Failed to execute command %s", command), e);
-		}
+		});
 	}
 
 	public static void executeSQL(String rawSQL) {
-		executeDBOperation(rawSQL, false);
+		executeDBOperation((connection) -> {
+			try (PreparedStatement statement = connection.prepareStatement(rawSQL)) {
+				statement.execute(rawSQL);
+				return null;
+			} catch (Exception e) {
+				throw new RuntimeException(e);
+			}
+		});
 	}
 
 	public static ResultSet executeSQLQuery(String rawSQL) {
-		return executeDBOperation(rawSQL, true);
+		return executeDBOperation((connection) -> {
+			try (PreparedStatement statement = connection.prepareStatement(rawSQL)) {
+				return statement.executeQuery(rawSQL);
+			} catch (Exception e) {
+				throw new RuntimeException(e);
+			}
+		});
 	}
 
-	private static ResultSet executeDBOperation(String rawSQL, boolean hasReturnValue) {
+	private static <R> R executeDBOperation(Function<Connection, R> f) {
 		Connection connection = null;
-
 		try {
 			connection = getUnitTestDBConnection();
-			return doExecuteDBOperation(connection, rawSQL, hasReturnValue);
+			return f.apply(connection);
 		} catch (Exception e) {
 			throw new RuntimeException("Can't execute SQL", e);
 		} finally {
@@ -82,18 +90,6 @@ public class UnitTestUtil {
 				} catch (SQLException e) {
 					// Ignore
 				}
-			}
-		}
-	}
-
-	private static ResultSet doExecuteDBOperation(Connection connection, String rawSQL, boolean hasReturnValue)
-			throws SQLException {
-		try (PreparedStatement statement = connection.prepareStatement(rawSQL)) {
-			if (hasReturnValue) {
-				return statement.executeQuery(rawSQL);
-			} else {
-				statement.execute();
-				return null;
 			}
 		}
 	}
