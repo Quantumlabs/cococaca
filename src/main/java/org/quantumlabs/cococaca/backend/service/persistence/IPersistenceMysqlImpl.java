@@ -26,9 +26,13 @@ import org.quantumlabs.cococaca.backend.Helper;
 import org.quantumlabs.cococaca.backend.service.persistence.model.Gender;
 import org.quantumlabs.cococaca.backend.service.persistence.model.IPostKey;
 import org.quantumlabs.cococaca.backend.service.persistence.model.ISubscriberKey;
+import org.quantumlabs.cococaca.backend.service.persistence.model.ISubscriberKeyImpl;
 import org.quantumlabs.cococaca.backend.service.persistence.model.Post;
 import org.quantumlabs.cococaca.backend.service.persistence.model.Subscriber;
 import org.quantumlabs.cococaca.backend.service.preference.Config;
+import org.quantumlabs.cococaca.backend.service.persistence.model.IContentKeyImpl;
+
+;
 
 public class IPersistenceMysqlImpl implements IPersistence {
 	private String _MYSQL_DB_URL;
@@ -70,7 +74,7 @@ public class IPersistenceMysqlImpl implements IPersistence {
 
 	@Override
 	public Post fetchPost(IPostKey postKey) {
-		return null;
+		return performOperation(FETCH_POST_BY_KEY, postKey);
 	}
 
 	private void handleEx(Exception e) {
@@ -309,8 +313,22 @@ public class IPersistenceMysqlImpl implements IPersistence {
 		performOperation(INSERT_SUBSCRIBER, param);
 	}
 
-	private static final IDatabaseOperation<Object, Post> FETCH_POST_BY_KEY = (connection, param) -> {
-		return null;
+	// Nullable
+	private static final IDatabaseOperation<IPostKey, Post> FETCH_POST_BY_KEY = (connection, param) -> {
+		String sql = "SELECT AUTHOR_ID, CONTENT_ID,DESCRIPTION FROM T_POST WHERE ID = ?";
+		Post post = null;
+		try (PreparedStatement statement = connection.prepareStatement(sql);) {
+			statement.setString(1, param.get());
+			ResultSet rs = statement.executeQuery();
+			if (rs.next()) {
+				post = new Post(param);
+				post.setAuthorKey(new ISubscriberKeyImpl(rs.getString(1)));
+				post.setContentKey(new IContentKeyImpl(rs.getString(2)));
+				post.setDescription(rs.getString(3));
+			}
+			Helper.assertTrue(!rs.next());
+		}
+		return post;
 	};
 
 	private static final IDatabaseOperation<StoreSubscriebrParam, Void> INSERT_SUBSCRIBER = (connection, param) -> {
@@ -327,22 +345,35 @@ public class IPersistenceMysqlImpl implements IPersistence {
 	};
 
 	private static final IDatabaseOperation<UpdateSubscriberParam, Void> UPDATE_SUBSCRIBER = (connection, param) -> {
-		String sql = "UPDATE T_SUBSCRIBER(ID,NAME,GENDER,AVATAR_ID) VALUES (?,?,?,?)";
+		String sql = "UPDATE T_SUBSCRIBER SET NAME=?, GENDER=?, AVATAR_ID=?  WHERE ID=?";
 		try (PreparedStatement statement = connection.prepareStatement(sql)) {
-			statement.setString(1, param.key.get());
-			statement.setString(2, param.name);
-			statement.setString(3, param.gender.toString());
-			statement.setString(4, param.avatarID);
+			statement.setString(1, param.name);
+			statement.setString(2, param.gender.toString());
+			statement.setString(3, param.avatarID);
+			statement.setString(4, param.key.get());
 			statement.execute();
 			return null;
 		}
 	};
 
-	private static final IDatabaseOperation<Object, Post> INSERT_POST = (connection, param) -> {
-		return null;
+	private static final IDatabaseOperation<Post, Post> INSERT_POST = (connection, param) -> {
+		String sql = "INSERT INTO T_POST (ID, author_id, content_id,description) values (?,?,?,?)";
+		try (PreparedStatement statement = connection.prepareStatement(sql)) {
+			statement.setString(1, param.getKey().get());
+			statement.setString(2, param.getAuthorKey().get());
+			statement.setString(3, param.getContentKey().get());
+			statement.setString(4, param.getDescription());
+			statement.execute();
+			return null;
+		}
 	};
 
 	private static final IDatabaseOperation<Object, Post> UPDATE_POST = (connection, param) -> {
 		return null;
 	};
+
+	@Override
+	public void storePost(Post post) {
+		performOperation(INSERT_POST, post);
+	}
 }

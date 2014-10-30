@@ -22,4 +22,6 @@ public interface IPersistence {
 	void storeSubscriber(Subscriber subscriber, String password);
 
 	void updateSubscriber(Subscriber subscriber);
+
+	void storePost(Post post);
 }

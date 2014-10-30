@@ -12,7 +12,12 @@ import org.junit.Test;
 import org.quantumlabs.cococaca.backend.UnitTestUtil;
 import org.quantumlabs.cococaca.backend.service.persistence.mock.UTPresistenceConfig;
 import org.quantumlabs.cococaca.backend.service.persistence.model.Gender;
+import org.quantumlabs.cococaca.backend.service.persistence.model.IContentKey;
+import org.quantumlabs.cococaca.backend.service.persistence.model.IContentKeyImpl;
+import org.quantumlabs.cococaca.backend.service.persistence.model.IPostKey;
+import org.quantumlabs.cococaca.backend.service.persistence.model.IPostKeyImpl;
 import org.quantumlabs.cococaca.backend.service.persistence.model.ISubscriberKey;
+import org.quantumlabs.cococaca.backend.service.persistence.model.Post;
 import org.quantumlabs.cococaca.backend.service.persistence.model.Subscriber;
 import org.quantumlabs.cococaca.backend.service.preference.Config;
 
@@ -26,12 +31,23 @@ public class IPersistenceMysqImplTest {
 	Gender gender2 = Gender.FEMALE;
 	String name2 = "__robert";
 	Map<String, Object> attributesMap = new HashMap<>();
-	ISubscriberKey key = generateSubscriberKey("_john");
+	ISubscriberKey subscriberKey = generateSubscriberKey("_john");
+	IContentKey contentKey = generateContentKey("_contentKey");
+	String description;
+	IPostKey postKey = generatePostKey("_postKey");
 
 	// @BeforeClass
 	public static void beforeClass() {
 		UnitTestUtil.setupDBEnv();
 		UnitTestUtil.tearDownDBEnv();
+	}
+
+	private IContentKey generateContentKey(String string) {
+		return new IContentKeyImpl(string);
+	}
+
+	private IPostKey generatePostKey(String string) {
+		return new IPostKeyImpl(string);
 	}
 
 	// @AfterClass
@@ -70,7 +86,7 @@ public class IPersistenceMysqImplTest {
 	}
 
 	private void verifyTheSameFromDB(Subscriber subscriber) {
-		Subscriber fetchedSubscriber = persistence.fetchSubscriber(key);
+		Subscriber fetchedSubscriber = persistence.fetchSubscriber(subscriberKey);
 		assertEquals(subscriber, fetchedSubscriber);
 		assertEquals(attributesMap.get("avatar"), fetchedSubscriber.getAvatarID());
 		assertEquals(attributesMap.get("gender"), fetchedSubscriber.getGender());
@@ -95,7 +111,7 @@ public class IPersistenceMysqImplTest {
 	}
 
 	private Subscriber generateSubscriber() {
-		Subscriber subscriber = new Subscriber(key);
+		Subscriber subscriber = new Subscriber(subscriberKey);
 		subscriber.setAvatarID(avatarID);
 		subscriber.setGender(gender);
 		subscriber.setName(name);
@@ -123,5 +139,29 @@ public class IPersistenceMysqImplTest {
 		attributesMap.put("avatar", avatarID2);
 		attributesMap.put("gender", gender2);
 		attributesMap.put("name", name2);
+	}
+
+	@Test
+	public void testFetchPost() {
+		preparePersistence();
+		Post post = generatedPost();
+		persistence.storePost(post);
+		verifyTheSameFromDB(post);
+	}
+
+	private void verifyTheSameFromDB(Post post) {
+		Post fetchedPost = persistence.fetchPost(postKey);
+		assertEquals(fetchedPost.getKey(), post.getKey());
+		assertEquals(fetchedPost.getAuthorKey(), post.getAuthorKey());
+		assertEquals(fetchedPost.getContentKey(), post.getContentKey());
+		assertEquals(fetchedPost.getDescription(), post.getDescription());
+	}
+
+	private Post generatedPost() {
+		Post post = new Post(postKey);
+		post.setAuthorKey(subscriberKey);
+		post.setContentKey(contentKey);
+		post.setDescription(description);
+		return post;
 	}
 }

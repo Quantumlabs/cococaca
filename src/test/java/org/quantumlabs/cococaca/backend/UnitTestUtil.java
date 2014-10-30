@@ -127,5 +127,6 @@ public class UnitTestUtil {
 	 * */
 	public static void clearAllTables() {
 		executeSQL("truncate t_subscriber;");
+		executeSQL("truncate t_post;");
 	}
 }
