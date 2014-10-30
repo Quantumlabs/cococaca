@@ -4,10 +4,10 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import org.junit.After;
-import org.junit.AfterClass;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.quantumlabs.cococaca.backend.UnitTestUtil;
 import org.quantumlabs.cococaca.backend.service.persistence.mock.UTPresistenceConfig;
@@ -19,13 +19,22 @@ import org.quantumlabs.cococaca.backend.service.preference.Config;
 public class IPersistenceMysqImplTest {
 	private IPersistence persistence;
 
-	@Before
+	String avatarID = "_avatarID";
+	String name = "_john";
+	Gender gender = Gender.MALE;
+	String avatarID2 = "__newAvatar";
+	Gender gender2 = Gender.FEMALE;
+	String name2 = "__robert";
+	Map<String, Object> attributesMap = new HashMap<>();
+	ISubscriberKey key = generateSubscriberKey("_john");
+
+	// @BeforeClass
 	public static void beforeClass() {
 		UnitTestUtil.setupDBEnv();
 		UnitTestUtil.tearDownDBEnv();
 	}
 
-	@After
+	// @AfterClass
 	public static void afterClass() {
 		UnitTestUtil.tearDownDBEnv();
 	}
@@ -55,22 +64,64 @@ public class IPersistenceMysqImplTest {
 	@Test
 	public void testFetchSubscriber() {
 		preparePersistence();
-		ISubscriberKey key = SubscriberKeyFactory.INSTANCE.newKey("_john");
-		Subscriber subscriber = new Subscriber(key);
-		subscriber.setAvatarID("_avatarID");
-		subscriber.setGender(Gender.MALE);
-		subscriber.setName("_john");
+		Subscriber subscriber = generateSubscriber();
 		persistence.storeSubscriber(subscriber, "_password");
+		verifyTheSameFromDB(subscriber);
+	}
+
+	private void verifyTheSameFromDB(Subscriber subscriber) {
 		Subscriber fetchedSubscriber = persistence.fetchSubscriber(key);
 		assertEquals(subscriber, fetchedSubscriber);
-		assertEquals("_avatarID", fetchedSubscriber.getAvatarID());
-		assertEquals(Gender.MALE, fetchedSubscriber.getGender());
-		assertEquals("_john", fetchedSubscriber.getName());
+		assertEquals(attributesMap.get("avatar"), fetchedSubscriber.getAvatarID());
+		assertEquals(attributesMap.get("gender"), fetchedSubscriber.getGender());
+		assertEquals(attributesMap.get("name"), fetchedSubscriber.getName());
 	}
 
+	@Test
 	public void testInsertSubscriber() {
+		preparePersistence();
+		Subscriber subscriber = generateSubscriber();
+		persistence.storeSubscriber(subscriber, "__password");
+		verifyTheSameFromDB(subscriber);
 	}
 
+	@Before
+	public void before() {
+		UnitTestUtil.clearAllTables();
+	}
+
+	private ISubscriberKey generateSubscriberKey(String string) {
+		return SubscriberKeyFactory.INSTANCE.newKey(name);
+	}
+
+	private Subscriber generateSubscriber() {
+		Subscriber subscriber = new Subscriber(key);
+		subscriber.setAvatarID(avatarID);
+		subscriber.setGender(gender);
+		subscriber.setName(name);
+		attributesMap.put("avatar", avatarID);
+		attributesMap.put("gender", gender);
+		attributesMap.put("name", name);
+		return subscriber;
+	}
+
+	@Test
 	public void testUpdateSubscriber() {
+		preparePersistence();
+		Subscriber subscriber = generateSubscriber();
+		persistence.storeSubscriber(subscriber, "__password");
+		verifyTheSameFromDB(subscriber);
+		updateSubscriberInMemory(subscriber);
+		persistence.updateSubscriber(subscriber);
+		verifyTheSameFromDB(subscriber);
+	}
+
+	private void updateSubscriberInMemory(Subscriber subscriber) {
+		subscriber.setAvatarID(avatarID2);
+		subscriber.setGender(gender2);
+		subscriber.setName(name2);
+		attributesMap.put("avatar", avatarID2);
+		attributesMap.put("gender", gender2);
+		attributesMap.put("name", name2);
 	}
 }

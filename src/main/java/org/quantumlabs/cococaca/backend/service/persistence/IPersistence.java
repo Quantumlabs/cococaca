@@ -20,4 +20,6 @@ public interface IPersistence {
 	boolean isStarted();
 
 	void storeSubscriber(Subscriber subscriber, String password);
+
+	void updateSubscriber(Subscriber subscriber);
 }

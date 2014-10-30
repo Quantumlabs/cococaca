@@ -271,19 +271,34 @@ public class IPersistenceMysqlImpl implements IPersistence {
 		}
 	};
 
-	static class StoreSubscriebrParam {
+	static class UpdateSubscriberParam {
 		final ISubscriberKey key;
 		final String name;
-		final String password;
+
 		final Gender gender;
 		final String avatarID;
 
-		StoreSubscriebrParam(ISubscriberKey key, String name, String password, Gender gender, String avatarID) {
+		UpdateSubscriberParam(ISubscriberKey key, String name, Gender gender, String avatarID) {
 			this.key = key;
 			this.name = name;
-			this.password = password;
 			this.gender = gender;
 			this.avatarID = avatarID;
+		}
+	}
+
+	@Override
+	public void updateSubscriber(Subscriber subscriber) {
+		UpdateSubscriberParam param = new UpdateSubscriberParam(subscriber.getKey(), subscriber.getName(),
+				subscriber.getGender(), subscriber.getAvatarID());
+		performOperation(UPDATE_SUBSCRIBER, param);
+	}
+
+	static class StoreSubscriebrParam extends UpdateSubscriberParam {
+		final String password;
+
+		StoreSubscriebrParam(ISubscriberKey key, String name, String password, Gender gender, String avatarID) {
+			super(key, name, gender, avatarID);
+			this.password = password;
 		}
 	}
 
@@ -311,8 +326,16 @@ public class IPersistenceMysqlImpl implements IPersistence {
 		}
 	};
 
-	private static final IDatabaseOperation<Object, Post> UPDATE_SUBSCRIBER = (connection, param) -> {
-		return null;
+	private static final IDatabaseOperation<UpdateSubscriberParam, Void> UPDATE_SUBSCRIBER = (connection, param) -> {
+		String sql = "UPDATE T_SUBSCRIBER(ID,NAME,GENDER,AVATAR_ID) VALUES (?,?,?,?)";
+		try (PreparedStatement statement = connection.prepareStatement(sql)) {
+			statement.setString(1, param.key.get());
+			statement.setString(2, param.name);
+			statement.setString(3, param.gender.toString());
+			statement.setString(4, param.avatarID);
+			statement.execute();
+			return null;
+		}
 	};
 
 	private static final IDatabaseOperation<Object, Post> INSERT_POST = (connection, param) -> {

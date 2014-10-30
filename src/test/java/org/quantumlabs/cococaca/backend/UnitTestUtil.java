@@ -18,7 +18,7 @@ import org.quantumlabs.cococaca.backend.service.persistence.mock.UTPresistenceCo
 import org.quantumlabs.cococaca.backend.service.preference.Config;
 
 public class UnitTestUtil {
-	private static final String workingDir = System.getenv("user.dir");
+	private static final String workingDir = System.getProperty("user.dir");
 	private static final String testResourcesDir = workingDir + "/src/resources";
 	private static final String DB_SCHEMA_INIT_SQL_FILE_PATH = testResourcesDir + "/db/initialization.sql";
 	private static final String DB_SCHEMA_UNINIT_SQL_FILE_PATH = testResourcesDir + "/db/uninitialization.sql";
@@ -27,7 +27,16 @@ public class UnitTestUtil {
 	private static Config utConfig = new UTPresistenceConfig();
 
 	public static void setupDBEnv() {
-		setupSchema();
+		try {
+			registerDriver();
+			setupSchema();
+		} catch (ClassNotFoundException e) {
+			throw new IllegalStateException("Can't initialize DB", e);
+		}
+	}
+
+	private static void registerDriver() throws ClassNotFoundException {
+		Class.forName(utConfig.get(CONFIG_PERSISTENCE_DB_DRIVER));
 	}
 
 	private static void setupSchema() {
@@ -111,5 +120,12 @@ public class UnitTestUtil {
 		} catch (ClassNotFoundException e) {
 			throw new RuntimeException("Can't initialize UT DB.", e);
 		}
+	}
+
+	/**
+	 * Only t_subscriber gets clear
+	 * */
+	public static void clearAllTables() {
+		executeSQL("truncate t_subscriber;");
 	}
 }
