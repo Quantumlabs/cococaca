@@ -3,6 +3,7 @@
  */
 package org.quantumlabs.cococaca.backend.service.dispatching;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -16,7 +17,10 @@ public class ResourceRouter {
 	private ReentrantReadWriteLock readAndWriteLock = new ReentrantReadWriteLock();
 	private ReadLock readLock = readAndWriteLock.readLock();
 	private WriteLock writeLock = readAndWriteLock.writeLock();
-	private IResourceRoutingPolicy policy;
+
+	public ResourceRouter() {
+		handlerRegistry = new ArrayList<>();
+	}
 
 	/**
 	 * Register specific resource handler on the fly. After registering, the
@@ -40,10 +44,6 @@ public class ResourceRouter {
 		}
 	}
 
-	public void setRountingPolicy(IResourceRoutingPolicy policy) {
-		this.policy = policy;
-	}
-
 	/**
 	 * Unregister specific resource handler on the fly. In case routing
 	 * unregistered resource, that would cause error.
@@ -61,30 +61,20 @@ public class ResourceRouter {
 	}
 
 	/**
-	 * Decorate the request Route request to the corresponding handler.
+	 * Route request to the corresponding handler.
 	 * 
 	 * @param request
 	 *            The restful request.
 	 * 
 	 * @return IResourceHandler The handler that binds to the resource which is
 	 *         requested.
+	 * @throws MalformedRequestException
 	 * */
-	public IResourceHandler decorateAndRoute(RESTRequest request) {
-		RESTRequest restRequest = (RESTRequest) request;
-		decorate(restRequest);
-		return syncGetHandler(restRequest.getResourceLocator());
+	public IResourceHandler retrieveResourceHandler(RESTRequest request) throws MalformedRequestException {
+		return syncGetHandler(request.getResourceLocator());
 	}
 
-	private void decorate(RESTRequest request) {
-		request.setResourceLocator(policy.extractResourceLocator(request));
-		Optional<ResourceFilter[]> filters = policy.extractResourceFilters(request);
-		if (filters.isPresent()) {
-			request.addFilter();
-		}
-		// TODO Decorate other fields of the request
-	}
-
-	private IResourceHandler syncGetHandler(String resourceLocator) {
+	private IResourceHandler syncGetHandler(String resourceLocator) throws MalformedRequestException {
 		try {
 			readLock.lock();
 			for (IResourceHandler handler : handlerRegistry) {
@@ -92,7 +82,7 @@ public class ResourceRouter {
 					return handler;
 				}
 			}
-			throw new IllegalArgumentException(String.format("Illegal resource locator %s", resourceLocator));
+			throw new MalformedRequestException(String.format("No resource handler for %s ", resourceLocator), null);
 		} finally {
 			readLock.unlock();
 		}

@@ -3,7 +3,7 @@ package org.quantumlabs.cococaca.backend.service.preference;
 public class Parameters {
     public static final String CONTENT_TYPE_VRND_QLBS_COCA_USR_V2_JSN_FMT = "vrnd.org.quantumlabs.cococaca.user.v2+json";
 
-    public static final String URL_FILTER_DELIMITER = "?";
+    public static final String URL_FILTER_DELIMITER = "\\?";
     public static final String URL_FILTER_CONCATENATOR = "&";
     public static final String HTTP_HEADER_ACCEPT = "Accept";
 

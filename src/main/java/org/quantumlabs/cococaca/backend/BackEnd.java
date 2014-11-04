@@ -1,5 +1,6 @@
 package org.quantumlabs.cococaca.backend;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.quantumlabs.cococaca.backend.service.TXNManager;
@@ -7,8 +8,8 @@ import org.quantumlabs.cococaca.backend.service.dispatching.CallBack;
 import org.quantumlabs.cococaca.backend.transaction.TransactionRegistry;
 
 public class BackEnd {
-	private List<CallBack<BackEnd, Void>> startCallBacks;
-	private List<CallBack<BackEnd, Void>> stopCallBacks;
+	private List<CallBack<BackEnd, Void>> startCallBacks = new ArrayList<>();
+	private List<CallBack<BackEnd, Void>> stopCallBacks = new ArrayList<>();;
 
 	public void start() {
 		doStart();

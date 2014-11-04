@@ -29,8 +29,4 @@ public class PersistenceFactory {
 			super(message);
 		}
 	}
-
-	public static PersistenceFactory getInstance() {
-		return null;
-	}
 }

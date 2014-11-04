@@ -14,7 +14,7 @@ public interface IResourceRoutingPolicy {
 	 * Extracting the resource locator, the corresponding request could be
 	 * processed by the <code>IResourceHandler</code> if is accepted by it.
 	 * 
-	 * @see {@link ResourceRouter#decorateAndRoute(RESTRequest)}
+	 * @see {@link ResourceRouter#retrieveResourceHandler(RESTRequest)}
 	 *      {@link org.quantumlabs.cococaca.backend.service.dispatching.IResourceHandler#accept(String)}
 	 * 
 	 * @param request
@@ -28,7 +28,7 @@ public interface IResourceRoutingPolicy {
 	 * Extracting the resource filters, it would be used for filtering parts
 	 * resources out of a set.
 	 * 
-	 * @see {@link ResourceRouter#decorateAndRoute(RESTRequest)}
+	 * @see {@link ResourceRouter#retrieveResourceHandler(RESTRequest)}
 	 * 
 	 * @param bareRequest
 	 *            The raw request string. It could be a URL string.
