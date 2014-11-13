@@ -8,24 +8,40 @@ import static org.quantumlabs.cococaca.backend.service.preference.Parameters.HTT
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.servlet.http.HttpServletRequest;
 
 import org.quantumlabs.cococaca.backend.Helper;
+import org.quantumlabs.cococaca.backend.service.preference.Parameters;
 
 public class RESTRequest {
 	private final HttpServletRequest request;
 	private String locator;
 	private Quantifier quantifier;
 	private List<ResourceFilter> filters;
+	private Object attachment;
+	private static final Pattern URL_WITHOUT_RESOURCE_PREFIX = Pattern.compile(String.format("%s(.*)",
+			Parameters.URL_REST_RESOURCE_PREFIX));
 
 	private RESTRequest(HttpServletRequest request) {
 		this.request = request;
+		setAttachment(request);
 		filters = new ArrayList<>();
 	}
 
+	/**
+	 * Return a URL start with Resource locator. e.g. <code>/Subscriber/1</code>
+	 * , <code>/Post/1</code> etc. reference to REST-api designs.
+	 * */
 	public String getURL() {
-		return Helper.getRelativeURL(request);
+		String urlWithPrefix = Helper.getRelativeURL(request);
+		Matcher matcher = URL_WITHOUT_RESOURCE_PREFIX.matcher(urlWithPrefix);
+		Helper.assertTrue(
+				String.format("Relative url %s request doesn't match \"/Resource/....\" pattern", urlWithPrefix),
+				matcher.matches());
+		return matcher.group(1);
 	}
 
 	public String getAccept() {
@@ -80,5 +96,13 @@ public class RESTRequest {
 
 	public enum Quantifier {
 		SINGULAR, PLURAL;
+	}
+
+	public Object getAttachment() {
+		return attachment;
+	}
+
+	public void setAttachment(Object attachment) {
+		this.attachment = attachment;
 	}
 }

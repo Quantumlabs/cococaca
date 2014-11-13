@@ -12,8 +12,8 @@ import org.quantumlabs.cococaca.backend.service.dispatching.RESTRequest.Resource
 
 public class DefaultResourceRoutingPolicy implements IResourceRoutingPolicy {
 
-	private static final int _RESOURCE_LOCATOR_IDX = 0;
-	private static final int _RESOURCE_FILTERS_IDX = 1;
+	private static final int _RESOURCE_LOCATOR_IDX = 1;
+	private static final int _RESOURCE_FILTERS_IDX = 2;
 	private static final int _FILTER_CONDITION_IDX = 0;
 	private static final int _FILTER_VALUE_IDX = 1;
 

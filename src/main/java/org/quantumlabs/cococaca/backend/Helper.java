@@ -11,9 +11,7 @@ public class Helper {
 	private static DefaultResourceRequestDecorator decorator = new DefaultResourceRequestDecorator();
 
 	public static void assertTrue(boolean expr) {
-		if (!expr) {
-			throw new AssertionError("Not true");
-		}
+		assertTrue("", expr);
 	}
 
 	public static String decorateResourceRequest(String rawRequest) {
@@ -53,6 +51,12 @@ public class Helper {
 		}
 	}
 
+	public static void assertNotNull(String message, Object o) {
+		if (!(Objects.nonNull(o))) {
+			throw new AssertionError(message);
+		}
+	}
+
 	public static void isNotEmptyString(String string) {
 		assertNotNull(string);
 		if (string.length() == 0) {
@@ -71,5 +75,11 @@ public class Helper {
 
 	private static void log(String string) {
 		System.out.println(string);
+	}
+
+	public static void assertTrue(String message, boolean expr) {
+		if (!expr) {
+			throw new AssertionError(message);
+		}
 	}
 }

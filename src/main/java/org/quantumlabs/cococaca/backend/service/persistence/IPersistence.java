@@ -1,5 +1,7 @@
 package org.quantumlabs.cococaca.backend.service.persistence;
 
+import java.io.InputStream;
+
 import org.quantumlabs.cococaca.backend.service.persistence.model.IPostKey;
 import org.quantumlabs.cococaca.backend.service.persistence.model.ISubscriberKey;
 import org.quantumlabs.cococaca.backend.service.persistence.model.Post;
@@ -24,4 +26,6 @@ public interface IPersistence {
 	void updateSubscriber(Subscriber subscriber);
 
 	void storePost(Post post);
+
+	String write(InputStream inputStream);
 }

@@ -10,12 +10,15 @@ import static org.quantumlabs.cococaca.backend.service.preference.Parameters.CON
 import static org.quantumlabs.cococaca.backend.service.preference.Parameters.CONFIG_PERSISTENCE_DB_URL;
 import static org.quantumlabs.cococaca.backend.service.preference.Parameters.CONFIG_PERSISTENCE_DB_USERNAME;
 
+import java.io.InputStream;
+import java.math.BigInteger;
 import java.sql.Connection;
 import java.sql.Driver;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.Properties;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -376,4 +379,21 @@ public class IPersistenceMysqlImpl implements IPersistence {
 	public void storePost(Post post) {
 		performOperation(INSERT_POST, post);
 	}
+
+	@Override
+	public String write(InputStream inputStream) {
+		return performOperation(WRITE_STREAM, inputStream);
+	}
+
+	private static final IDatabaseOperation<InputStream, String> WRITE_STREAM = (connection, inputStream) -> {
+		String sql = "INSERT INTO T_FILE_STORE ( BINARY_DATA) values (?)";
+		try (PreparedStatement statement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+			statement.setBinaryStream(2, inputStream);
+			// Auto generated key
+			int generatedKey = statement.executeUpdate();
+			statement.getGeneratedKeys();
+			String key = BigInteger.valueOf(generatedKey).toString();
+			return key;
+		}
+	};
 }
