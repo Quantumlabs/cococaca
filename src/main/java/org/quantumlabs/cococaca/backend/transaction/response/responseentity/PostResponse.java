@@ -1,5 +1,7 @@
 package org.quantumlabs.cococaca.backend.transaction.response.responseentity;
 
+import java.util.function.Function;
+
 import org.quantumlabs.cococaca.backend.Helper;
 import org.quantumlabs.cococaca.backend.service.persistence.model.Danmuku;
 import org.quantumlabs.cococaca.backend.service.persistence.model.Post;
@@ -22,45 +24,34 @@ public class PostResponse implements JsonResponse {
 
 	@Override
 	public String get() {
+		return this.buildJsonArray(this::buildSinglePost, posts);
+	}
+
+	private String buildSinglePost(Post post) {
+		return String.format(_JSON_TEMP, post.getKey().get(), post.getAuthorKey().get(), post.getContentKey().get(),
+				post.getDescription(), buildDanmukus(post));
+	}
+
+	private <T> String buildJsonArray(Function<T, String> op, T[] suppliers) {
 		StringBuilder builder = new StringBuilder();
 		builder.append("[");
-		for (Post post : posts) {
-			builder.append(buildSinglePost(post));
+		for (int idx = 0; idx < suppliers.length; idx++) {
+			T t = suppliers[idx];
+			builder.append(op.apply(t));
+			if (!isLast(suppliers.length, idx)) {
+				builder.append(",");
+			}
 		}
 		builder.append("]");
 		return builder.toString();
 	}
 
-	private String buildSinglePost(Post post) {
-		return String.format(_JSON_TEMP, post.getKey().get(), post
-				.getAuthorKey().get(), post.getContentKey().get(), post
-				.getDescription(), buildDanmukus(post));
+	private String buildDanmuku(Danmuku danmuku) {
+		return String.format(_DANMUKU_TEMP, danmuku.getAuthorID(), danmuku.getContent(), danmuku.getTimeStamp());
 	}
 
-	// TODO functional mapping iteration.
-	// private <T> void buildJsonArray(bina<T> op, T... suppliers) {
-	// StringBuilder builder = new StringBuilder();
-	// for (int idx = 0; idx < suppliers.length; idx++) {
-	// T t = suppliers[idx];
-	// op.apply(t, u)
-	// if (!isLast(danmukus.length, idx)) {
-	// builder.append(",");
-	// }
-	// }
-	// }
-
 	private String buildDanmukus(Post post) {
-		StringBuilder builder = new StringBuilder();
-		Danmuku[] danmukus = post.getDanmukus();
-		for (int idx = 0; idx < danmukus.length; idx++) {
-			Danmuku danmuku = danmukus[idx];
-			builder.append(String.format(_DANMUKU_TEMP, danmuku.getAuthorID(),
-					danmuku.getContent(), danmuku.getTimeStamp()));
-			if (!isLast(danmukus.length, idx)) {
-				builder.append(",");
-			}
-		}
-		return builder.toString();
+		return buildJsonArray(this::buildDanmuku, post.getDanmukus());
 	}
 
 	private boolean isLast(int arrayLength, int idx) {
