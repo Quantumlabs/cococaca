@@ -1,7 +1,7 @@
 package org.quantumlabs.cococaca.backend.service.persistence;
 
+import static org.quantumlabs.cococaca.backend.Helper.assertNotEmtryString;
 import static org.quantumlabs.cococaca.backend.Helper.assertTrue;
-import static org.quantumlabs.cococaca.backend.Helper.isNotEmptyString;
 import static org.quantumlabs.cococaca.backend.service.persistence.model.Gender.FEMALE;
 import static org.quantumlabs.cococaca.backend.service.persistence.model.Gender.MALE;
 import static org.quantumlabs.cococaca.backend.service.preference.Parameters.CONFIG_PERSISTENCE_DB_DRIVER;
@@ -24,16 +24,19 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.List;
+import java.util.ArrayList;
 
 import org.quantumlabs.cococaca.backend.Helper;
 import org.quantumlabs.cococaca.backend.service.persistence.model.Gender;
+import org.quantumlabs.cococaca.backend.service.persistence.model.IContentKeyImpl;
 import org.quantumlabs.cococaca.backend.service.persistence.model.IPostKey;
+import org.quantumlabs.cococaca.backend.service.persistence.model.IPostKeyImpl;
 import org.quantumlabs.cococaca.backend.service.persistence.model.ISubscriberKey;
 import org.quantumlabs.cococaca.backend.service.persistence.model.ISubscriberKeyImpl;
 import org.quantumlabs.cococaca.backend.service.persistence.model.Post;
 import org.quantumlabs.cococaca.backend.service.persistence.model.Subscriber;
 import org.quantumlabs.cococaca.backend.service.preference.Config;
-import org.quantumlabs.cococaca.backend.service.persistence.model.IContentKeyImpl;
 
 ;
 
@@ -52,11 +55,11 @@ public class IPersistenceMysqlImpl implements IPersistence {
 		_MYSQL_DB_USERNAME = config.get(CONFIG_PERSISTENCE_DB_USERNAME);
 		_MYSQL_DB_PASSWORD = config.get(CONFIG_PERSISTENCE_DB_PASSWORD);
 		_DB_DRIVER_CLASS = config.get(CONFIG_PERSISTENCE_DB_DRIVER);
-		isNotEmptyString(_MYSQL_DB_URL);
-		isNotEmptyString(_MYSQL_DB_USERNAME);
-		isNotEmptyString(_MYSQL_DB_PASSWORD);
-		isNotEmptyString(_DB_DRIVER_CLASS);
-		isNotEmptyString(poolSizeString);
+		assertNotEmtryString(_MYSQL_DB_URL);
+		assertNotEmtryString(_MYSQL_DB_USERNAME);
+		assertNotEmtryString(_MYSQL_DB_PASSWORD);
+		assertNotEmtryString(_DB_DRIVER_CLASS);
+		assertNotEmtryString(poolSizeString);
 		_MYSQL_DB_CONNECTION_POOL_SIZE = Integer.valueOf(poolSizeString);
 		prepareConnectionPool();
 	}
@@ -97,7 +100,8 @@ public class IPersistenceMysqlImpl implements IPersistence {
 	}
 
 	private void prepareConnectionPool() {
-		pool = new ConnectionPool(_MYSQL_DB_URL, _MYSQL_DB_USERNAME, _MYSQL_DB_PASSWORD, _DB_DRIVER_CLASS,
+		pool = new ConnectionPool(_MYSQL_DB_URL, _MYSQL_DB_USERNAME,
+				_MYSQL_DB_PASSWORD, _DB_DRIVER_CLASS,
 				_MYSQL_DB_CONNECTION_POOL_SIZE);
 	}
 
@@ -128,7 +132,8 @@ public class IPersistenceMysqlImpl implements IPersistence {
 		private final static String _MANDATORY_PROPERTY_PASSWORD = "password";
 		private AtomicInteger connectionsOutSide = new AtomicInteger(0);
 
-		ConnectionPool(final String URL, final String userName, final String pw, final String driverClass, int size) {
+		ConnectionPool(final String URL, final String userName,
+				final String pw, final String driverClass, int size) {
 			this.size = size;
 			Properties properties = new Properties();
 			properties.setProperty(_MANDATORY_PROPERTY_USERNAME, userName);
@@ -137,7 +142,8 @@ public class IPersistenceMysqlImpl implements IPersistence {
 				driver = (Driver) Class.forName(driverClass).newInstance();
 				DriverManager.registerDriver(driver);
 				createConnections(URL, properties);
-			} catch (InstantiationException | IllegalAccessException | ClassNotFoundException | SQLException e) {
+			} catch (InstantiationException | IllegalAccessException
+					| ClassNotFoundException | SQLException e) {
 				throw new RuntimeException(e);
 			}
 		}
@@ -169,13 +175,16 @@ public class IPersistenceMysqlImpl implements IPersistence {
 			}
 			if (connectionsOutSide.get() > 0) {
 				doReleaseAll();
-				throw new RuntimeException(String.format("Still %s connections are outside.", connectionsOutSide.get()));
+				throw new RuntimeException(String.format(
+						"Still %s connections are outside.",
+						connectionsOutSide.get()));
 			} else {
 				doReleaseAll();
 			}
 		}
 
-		private void createConnections(String url, Properties properties) throws SQLException {
+		private void createConnections(String url, Properties properties)
+				throws SQLException {
 			for (int i = 0; i < getSize(); i++) {
 				connections.add(driver.connect(url, properties));
 			}
@@ -187,20 +196,27 @@ public class IPersistenceMysqlImpl implements IPersistence {
 
 		public Connection checkout() {
 			try {
-				Connection connection = connections.poll(timeoutPolicy.checkoutTimeout(), timeoutPolicy.timeUnit());
+				Connection connection = connections.poll(
+						timeoutPolicy.checkoutTimeout(),
+						timeoutPolicy.timeUnit());
 				connectionsOutSide.incrementAndGet();
 				return connection;
 			} catch (InterruptedException e) {
-				throw new RuntimeException("Should not be interrupted while checking out Connection", e);
+				throw new RuntimeException(
+						"Should not be interrupted while checking out Connection",
+						e);
 			}
 		}
 
 		public void checkin(Connection connection) {
 			try {
-				connections.offer(connection, timeoutPolicy.checkinTimeout(), timeoutPolicy.timeUnit());
+				connections.offer(connection, timeoutPolicy.checkinTimeout(),
+						timeoutPolicy.timeUnit());
 				connectionsOutSide.decrementAndGet();
 			} catch (InterruptedException e) {
-				throw new RuntimeException("Should not be interrupted while checking in Connection", e);
+				throw new RuntimeException(
+						"Should not be interrupted while checking in Connection",
+						e);
 			}
 		}
 	}
@@ -259,8 +275,8 @@ public class IPersistenceMysqlImpl implements IPersistence {
 		}
 	}
 
-	private static final IDatabaseOperation<FetchSubscriberParam, Subscriber> FETCH_SUBSCRIBER_BY_KEY = (connection,
-			subscriberParam) -> {
+	private static final IDatabaseOperation<FetchSubscriberParam, Subscriber> FETCH_SUBSCRIBER_BY_KEY = (
+			connection, subscriberParam) -> {
 		String sql = "SELECT NAME,GENDER,AVATAR_ID FROM T_SUBSCRIBER WHERE ID = ?";
 		Subscriber subscriber = null;
 		try (PreparedStatement statement = connection.prepareStatement(sql)) {
@@ -270,7 +286,8 @@ public class IPersistenceMysqlImpl implements IPersistence {
 			assertTrue(rs.next());
 			subscriber = new Subscriber(subscriberParam.subsKey);
 			subscriber.setName(rs.getString(1));
-			subscriber.setGender(rs.getString(2).equals(MALE.toString()) ? MALE : FEMALE);
+			subscriber.setGender(rs.getString(2).equals(MALE.toString()) ? MALE
+					: FEMALE);
 			subscriber.setAvatarID(rs.getString(3));
 			// Should no more item selected.
 			assertTrue(!rs.next());
@@ -285,7 +302,8 @@ public class IPersistenceMysqlImpl implements IPersistence {
 		final Gender gender;
 		final String avatarID;
 
-		UpdateSubscriberParam(ISubscriberKey key, String name, Gender gender, String avatarID) {
+		UpdateSubscriberParam(ISubscriberKey key, String name, Gender gender,
+				String avatarID) {
 			this.key = key;
 			this.name = name;
 			this.gender = gender;
@@ -295,7 +313,8 @@ public class IPersistenceMysqlImpl implements IPersistence {
 
 	@Override
 	public void updateSubscriber(Subscriber subscriber) {
-		UpdateSubscriberParam param = new UpdateSubscriberParam(subscriber.getKey(), subscriber.getName(),
+		UpdateSubscriberParam param = new UpdateSubscriberParam(
+				subscriber.getKey(), subscriber.getName(),
 				subscriber.getGender(), subscriber.getAvatarID());
 		performOperation(UPDATE_SUBSCRIBER, param);
 	}
@@ -303,7 +322,8 @@ public class IPersistenceMysqlImpl implements IPersistence {
 	static class StoreSubscriebrParam extends UpdateSubscriberParam {
 		final String password;
 
-		StoreSubscriebrParam(ISubscriberKey key, String name, String password, Gender gender, String avatarID) {
+		StoreSubscriebrParam(ISubscriberKey key, String name, String password,
+				Gender gender, String avatarID) {
 			super(key, name, gender, avatarID);
 			this.password = password;
 		}
@@ -311,14 +331,16 @@ public class IPersistenceMysqlImpl implements IPersistence {
 
 	@Override
 	public void storeSubscriber(Subscriber subscriber, String password) {
-		StoreSubscriebrParam param = new StoreSubscriebrParam(subscriber.getKey(), subscriber.getName(), password,
+		StoreSubscriebrParam param = new StoreSubscriebrParam(
+				subscriber.getKey(), subscriber.getName(), password,
 				subscriber.getGender(), subscriber.getAvatarID());
 		performOperation(INSERT_SUBSCRIBER, param);
 	}
 
 	// Nullable
-	private static final IDatabaseOperation<IPostKey, Post> FETCH_POST_BY_KEY = (connection, param) -> {
-		String sql = "SELECT AUTHOR_ID, CONTENT_ID,DESCRIPTION FROM T_POST WHERE ID = ?";
+	private static final IDatabaseOperation<IPostKey, Post> FETCH_POST_BY_KEY = (
+			connection, param) -> {
+		String sql = "SELECT AUTHOR_ID, CONTENT_ID,DESCRIPTION, DATESTAMP FROM T_POST WHERE ID = ?";
 		Post post = null;
 		try (PreparedStatement statement = connection.prepareStatement(sql);) {
 			statement.setString(1, param.get());
@@ -328,13 +350,15 @@ public class IPersistenceMysqlImpl implements IPersistence {
 				post.setAuthorKey(new ISubscriberKeyImpl(rs.getString(1)));
 				post.setContentKey(new IContentKeyImpl(rs.getString(2)));
 				post.setDescription(rs.getString(3));
+				post.setTimeStamp(Long.valueOf(rs.getString(4)));
 			}
 			Helper.assertTrue(!rs.next());
 		}
 		return post;
 	};
 
-	private static final IDatabaseOperation<StoreSubscriebrParam, Void> INSERT_SUBSCRIBER = (connection, param) -> {
+	private static final IDatabaseOperation<StoreSubscriebrParam, Void> INSERT_SUBSCRIBER = (
+			connection, param) -> {
 		String sql = "INSERT INTO T_SUBSCRIBER (ID,NAME,PASSWORD,GENDER,AVATAR_ID) VALUE (?,?,?,?,?)";
 		try (PreparedStatement statement = connection.prepareStatement(sql)) {
 			statement.setString(1, param.key.get());
@@ -347,7 +371,8 @@ public class IPersistenceMysqlImpl implements IPersistence {
 		}
 	};
 
-	private static final IDatabaseOperation<UpdateSubscriberParam, Void> UPDATE_SUBSCRIBER = (connection, param) -> {
+	private static final IDatabaseOperation<UpdateSubscriberParam, Void> UPDATE_SUBSCRIBER = (
+			connection, param) -> {
 		String sql = "UPDATE T_SUBSCRIBER SET NAME=?, GENDER=?, AVATAR_ID=?  WHERE ID=?";
 		try (PreparedStatement statement = connection.prepareStatement(sql)) {
 			statement.setString(1, param.name);
@@ -359,19 +384,23 @@ public class IPersistenceMysqlImpl implements IPersistence {
 		}
 	};
 
-	private static final IDatabaseOperation<Post, Post> INSERT_POST = (connection, param) -> {
-		String sql = "INSERT INTO T_POST (ID, author_id, content_id,description) values (?,?,?,?)";
+	private static final IDatabaseOperation<Post, Post> INSERT_POST = (
+			connection, param) -> {
+		String sql = "INSERT INTO T_POST (ID, author_id, content_id,description,datestamp) values (?,?,?,?,?)";
 		try (PreparedStatement statement = connection.prepareStatement(sql)) {
 			statement.setString(1, param.getKey().get());
 			statement.setString(2, param.getAuthorKey().get());
 			statement.setString(3, param.getContentKey().get());
 			statement.setString(4, param.getDescription());
+			statement.setString(5, Long.valueOf(param.getTimeStamp())
+					.toString());
 			statement.execute();
 			return null;
 		}
 	};
 
-	private static final IDatabaseOperation<Object, Post> UPDATE_POST = (connection, param) -> {
+	private static final IDatabaseOperation<Object, Post> UPDATE_POST = (
+			connection, param) -> {
 		return null;
 	};
 
@@ -385,15 +414,54 @@ public class IPersistenceMysqlImpl implements IPersistence {
 		return performOperation(WRITE_STREAM, inputStream);
 	}
 
-	private static final IDatabaseOperation<InputStream, String> WRITE_STREAM = (connection, inputStream) -> {
-		String sql = "INSERT INTO T_FILE_STORE ( BINARY_DATA) values (?)";
-		try (PreparedStatement statement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
-			statement.setBinaryStream(2, inputStream);
+	private static final IDatabaseOperation<InputStream, String> WRITE_STREAM = (
+			connection, inputStream) -> {
+		String sql = "INSERT INTO T_FILE_STORE ( BIN_DATA) values (?)";
+		try (PreparedStatement statement = connection.prepareStatement(sql,
+				Statement.RETURN_GENERATED_KEYS)) {
+			statement.setBinaryStream(1, inputStream);
 			// Auto generated key
-			int generatedKey = statement.executeUpdate();
-			statement.getGeneratedKeys();
+			statement.executeUpdate();
+			ResultSet keyRs = statement.getGeneratedKeys();
+			assertTrue(keyRs.next());
+			int generatedKey = keyRs.getInt(1);
 			String key = BigInteger.valueOf(generatedKey).toString();
 			return key;
 		}
+
 	};
+
+	private static class PostFetchingCondition {
+		ISubscriberKey subscriberKey;
+	}
+
+	private static final IDatabaseOperation<PostFetchingCondition, Post[]> FETCH_LAST_X_SUBSCRIBED_POSTS = (
+			connection, condition) -> {
+		/*
+		 * ID AUTHOR_ID CONTENT_ID DESCRIPTION DATESTAMP
+		 */
+		String sql = "SELECT F.ID, F.AUTHOR_ID, F.CONTENT_ID, F.DESCRIPTION, F.DATESTAMP FROM (SELECT FOLLOWER_ID, FOLLOWEE_ID FROM T_SUBSCRIBER C JOIN TC_FOLLOWSHIP D  ON C.ID = D.FOLLOWER_ID WHERE ID=?) E JOIN T_POST F ON E.FOLLOWEE_ID = F.AUTHOR_ID ORDER BY DATESTAMP";
+		try (PreparedStatement statement = connection.prepareStatement(sql)) {
+			statement.setString(1, condition.subscriberKey.get());
+			ResultSet rs = statement.executeQuery();
+			// Probably no result at all.
+			List<Post> posts = new ArrayList<>();
+			while (rs.next()) {
+				Post post = new Post(new IPostKeyImpl(rs.getString(1)));
+				post.setAuthorKey(new ISubscriberKeyImpl(rs.getString(2)));
+				post.setContentKey(new IContentKeyImpl(rs.getString(3)));
+				post.setDescription(rs.getString(4));
+				//post.setTimeStamp(Long.valueOf(rs.getString(5)));
+				posts.add(post);
+			}
+			return posts.toArray(new Post[posts.size()]);
+		}
+	};
+
+	@Override
+	public Post[] fetchPostsForSubscriber(ISubscriberKey subscriberKey) {
+		PostFetchingCondition condition = new PostFetchingCondition();
+		condition.subscriberKey = subscriberKey;
+		return performOperation(FETCH_LAST_X_SUBSCRIBED_POSTS, condition);
+	}
 }

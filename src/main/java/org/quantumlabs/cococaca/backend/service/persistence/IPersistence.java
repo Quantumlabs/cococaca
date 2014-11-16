@@ -28,4 +28,6 @@ public interface IPersistence {
 	void storePost(Post post);
 
 	String write(InputStream inputStream);
+
+	Post[] fetchPostsForSubscriber(ISubscriberKey subscriberKey);
 }

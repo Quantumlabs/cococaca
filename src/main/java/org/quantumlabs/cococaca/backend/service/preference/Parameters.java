@@ -32,10 +32,14 @@ public class Parameters {
 	public static int SVLT_PIC_UPLDR_BUFR_SIZE_THRESHOLD = 512; // The file will
 
 	public static final File SVLT_PIC_UPLDR_REPO = null;
-
 	public static final String SVLT_STREAM_PARAM_DESCRIPTION = "description";
 
 	public static final String SVLT_POST_AHTOR_ID = "author";
 
 	public static final long _1K = 1024;
+	public static final long _1M = 1024 * _1K;
+
+	public static final long SVLT_PIC_UPLDR_SIZE_MAX = 30 * _1M;
+
+	public static final String FRONT_END_HTML_NEW_POST_FIELD = "img_content";
 }

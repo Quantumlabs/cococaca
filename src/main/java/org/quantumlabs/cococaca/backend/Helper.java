@@ -5,6 +5,7 @@ import java.util.Objects;
 import javax.servlet.http.HttpServletRequest;
 
 import org.quantumlabs.cococaca.backend.service.preference.Parameters;
+import org.quantumlabs.cococaca.web.HTTPParameterMissingException;
 
 public class Helper {
 
@@ -24,12 +25,16 @@ public class Helper {
 
 	private static class DefaultResourceRequestDecorator {
 		private String decorate(String rawRequest) {
-			StringBuilder sb = new StringBuilder(Parameters.URL_REST_RESOURCE_PREFIX.length() + rawRequest.length());
-			return sb.append(Parameters.URL_REST_RESOURCE_PREFIX).append(rawRequest).toString();
+			StringBuilder sb = new StringBuilder(
+					Parameters.URL_REST_RESOURCE_PREFIX.length()
+							+ rawRequest.length());
+			return sb.append(Parameters.URL_REST_RESOURCE_PREFIX)
+					.append(rawRequest).toString();
 		}
 
 		private String undecorate(String decoratedRequest) {
-			return decoratedRequest.substring(Parameters.URL_REST_RESOURCE_PREFIX.length());
+			return decoratedRequest
+					.substring(Parameters.URL_REST_RESOURCE_PREFIX.length());
 		}
 	}
 
@@ -42,7 +47,8 @@ public class Helper {
 	 * */
 	public static String getRelativeURL(HttpServletRequest request) {
 		String contextPath = ((HttpServletRequest) request).getContextPath();
-		return ((HttpServletRequest) request).getRequestURI().substring(contextPath.length());
+		return ((HttpServletRequest) request).getRequestURI().substring(
+				contextPath.length());
 	}
 
 	public static void assertNotNull(Object o) {
@@ -57,20 +63,44 @@ public class Helper {
 		}
 	}
 
-	public static void isNotEmptyString(String string) {
-		assertNotNull(string);
-		if (string.length() == 0) {
-			throw new AssertionError("Empty String.");
-		}
+	public static void assertNotEmtryString(String string) {
+		assertTrue(!isEmptyString(string));
+	}
+
+	public static boolean isEmptyString(String string) {
+		return string == null || "".equals(string);
 	}
 
 	public static void logError(Exception e) {
+		logError(null, e);
+	}
+
+	public static void logError(String message, Exception e) {
+		if (message != null) {
+			log(message);
+		}
+		log(appendRootCause(e));
+	}
+
+	private static String appendRootCause(Throwable e) {
 		StringBuilder builder = new StringBuilder();
-		for (StackTraceElement stackElement : e.getStackTrace()) {
+		if (e.getCause() != null) {
+			return appendRootCause(e.getCause());
+		} else {
+			String causeStackTrace = buildStackTrace(e.getCause());
+			builder.append("Caused by --->\n");
+			builder.append(causeStackTrace);
+			return builder.toString();
+		}
+	}
+
+	private static String buildStackTrace(Throwable cause) {
+		StringBuilder builder = new StringBuilder();
+		for (StackTraceElement stackElement : cause.getStackTrace()) {
 			builder.append(stackElement.toString());
 			builder.append("\n");
 		}
-		log(builder.toString());
+		return builder.toString();
 	}
 
 	private static void log(String string) {
@@ -81,5 +111,17 @@ public class Helper {
 		if (!expr) {
 			throw new AssertionError(message);
 		}
+	}
+
+	// Only use for validating HTTP parameters, <strong></strong>
+	public static void validateHTTPParameterNotNull(String message, Object o)
+			throws HTTPParameterMissingException {
+		if (o == null) {
+			throw new HTTPParameterMissingException(message);
+		}
+	}
+
+	public static void assertError() {
+		throw new AssertionError();
 	}
 }

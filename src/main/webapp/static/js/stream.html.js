@@ -69,7 +69,7 @@ var primary_color_state = -1;
 
 _URL_COMMENTED_USER_FORMAT = "post/commented?ID={0}";
 _URL_CDN_AVATAR_FORMAT = "cdn/avatar?ID={0}";
-_URL_POSTS_BATCH_RETRIEVE_STATIC = "post/batch?type=default";
+_URL_POSTS_BATCH_RETRIEVE_STATIC = "Post/";
 _URL_CDN_CONTENT_IMG_FORMAT = "cdn/img?uuid={0}"
 
 /**
@@ -214,7 +214,7 @@ function build_post_item(post_info) {
 }
 function create_posts() {
 	var posts = $.ajax({
-		url : sformat(_URL_POSTS_BATCH_RETRIEVE_STATIC),
+		url : _URL_POSTS_BATCH_RETRIEVE_STATIC,
 		success : function(data, status, xhr) {
 			var main_container = $("div[name=main-container]");
 			for (var i = 0; i < posts.length; i++) {

@@ -35,6 +35,7 @@ public class IPersistenceMysqImplTest {
 	IContentKey contentKey = generateContentKey("_contentKey");
 	String description;
 	IPostKey postKey = generatePostKey("_postKey");
+	long postTimeStamp = 1022412312;
 
 	// @BeforeClass
 	public static void beforeClass() {
@@ -86,9 +87,11 @@ public class IPersistenceMysqImplTest {
 	}
 
 	private void verifyTheSameFromDB(Subscriber subscriber) {
-		Subscriber fetchedSubscriber = persistence.fetchSubscriber(subscriberKey);
+		Subscriber fetchedSubscriber = persistence
+				.fetchSubscriber(subscriberKey);
 		assertEquals(subscriber, fetchedSubscriber);
-		assertEquals(attributesMap.get("avatar"), fetchedSubscriber.getAvatarID());
+		assertEquals(attributesMap.get("avatar"),
+				fetchedSubscriber.getAvatarID());
 		assertEquals(attributesMap.get("gender"), fetchedSubscriber.getGender());
 		assertEquals(attributesMap.get("name"), fetchedSubscriber.getName());
 	}
@@ -155,6 +158,7 @@ public class IPersistenceMysqImplTest {
 		assertEquals(fetchedPost.getAuthorKey(), post.getAuthorKey());
 		assertEquals(fetchedPost.getContentKey(), post.getContentKey());
 		assertEquals(fetchedPost.getDescription(), post.getDescription());
+		assertEquals(fetchedPost.getTimeStamp(), post.getTimeStamp());
 	}
 
 	private Post generatedPost() {
@@ -162,6 +166,7 @@ public class IPersistenceMysqImplTest {
 		post.setAuthorKey(subscriberKey);
 		post.setContentKey(contentKey);
 		post.setDescription(description);
+		post.setTimeStamp(postTimeStamp);
 		return post;
 	}
 }

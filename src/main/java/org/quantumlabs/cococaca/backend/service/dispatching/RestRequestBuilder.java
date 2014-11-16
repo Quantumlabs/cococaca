@@ -18,11 +18,12 @@ public class RestRequestBuilder {
 	 * */
 	private void decorate(RESTRequest request) {
 		request.setResourceLocator(policy.extractResourceLocator(request));
-		Optional<ResourceFilter[]> filters = policy.extractResourceFilters(request);
-		if (filters.isPresent()) {
-			request.addFilter();
+		request.setQuantifier(policy.extractQuantifier(request));
+		request.setResourceIdentifier(policy.extractResourceIdentifier(request));
+		ResourceFilter[] filters = policy.extractResourceFilters(request);
+		if (filters != null) {
+			request.addFilter(filters);
 		}
-		// TODO Decorate other fields of the request
 	}
 
 	public RESTRequest build(HttpServletRequest request) {

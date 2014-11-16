@@ -2,6 +2,7 @@ package org.quantumlabs.cococaca.backend.service.dispatching;
 
 import java.util.Optional;
 
+import org.quantumlabs.cococaca.backend.service.dispatching.RESTRequest.Quantifier;
 import org.quantumlabs.cococaca.backend.service.dispatching.RESTRequest.ResourceFilter;
 
 /**
@@ -35,5 +36,9 @@ public interface IResourceRoutingPolicy {
 	 * 
 	 * @return The resource filters. It could be a URL string.
 	 * */
-	Optional<ResourceFilter[]> extractResourceFilters(RESTRequest bareRequest);
+	ResourceFilter[] extractResourceFilters(RESTRequest bareRequest);
+
+	Quantifier extractQuantifier(RESTRequest request);
+
+	String extractResourceIdentifier(RESTRequest request);
 }

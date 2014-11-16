@@ -12,7 +12,8 @@ import org.quantumlabs.cococaca.backend.transaction.response.contenttype.Accepta
 import org.quantumlabs.cococaca.backend.transaction.response.contenttype.BinaryReponse;
 import org.quantumlabs.cococaca.backend.transaction.response.contenttype.JsonResponse;
 
-public class HTTPServletResponseBasedCallBack implements IResourceHandlerCallBack {
+public class HTTPServletResponseBasedCallBack implements
+		IResourceHandlerCallBack {
 	private final HttpServletResponse resp;
 
 	public HTTPServletResponseBasedCallBack(HttpServletResponse resp) {
@@ -21,12 +22,18 @@ public class HTTPServletResponseBasedCallBack implements IResourceHandlerCallBac
 
 	@Override
 	public void onResourceHandlingFailed(RESTRequest request, Object attachment) {
-		// TODO Auto-generated method stub
-
+		try (Writer writer = resp.getWriter()) {
+			// General resource handling failure code.
+			writer.write("{status:'255'}");
+			writer.close();
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	@Override
-	public void onResouceHandlingCompleted(RESTRequest request, AcceptableResponse response) {
+	public void onResouceHandlingCompleted(RESTRequest request,
+			AcceptableResponse response) {
 		writeToResponse(response);
 	}
 
@@ -35,12 +42,17 @@ public class HTTPServletResponseBasedCallBack implements IResourceHandlerCallBac
 		try {
 			if (acceptableResponse instanceof JsonResponse) {
 				closableOutputChannel = resp.getWriter();
-				((Writer) closableOutputChannel).write(JsonResponse.class.cast(acceptableResponse).get());
+				((Writer) closableOutputChannel).write(JsonResponse.class.cast(
+						acceptableResponse).get());
 			} else if (acceptableResponse instanceof BinaryReponse) {
 				closableOutputChannel = resp.getOutputStream();
-				((OutputStream) closableOutputChannel).write(BinaryReponse.class.cast(acceptableResponse).get());
+				((OutputStream) closableOutputChannel)
+						.write(BinaryReponse.class.cast(acceptableResponse)
+								.get());
 			} else {
-				throw new RuntimeException(String.format("Unsupported data content-type so for %s", acceptableResponse));
+				throw new RuntimeException(String.format(
+						"Unsupported data content-type so for %s",
+						acceptableResponse));
 			}
 		} catch (IOException e) {
 			handleEx(e);

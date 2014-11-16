@@ -1,6 +1,6 @@
 package org.quantumlabs.cococaca.backend.service.dispatching;
 
-public class MalformedRequestException extends Exception {
+public class MalformedRequestException extends RuntimeException {
 	private static final long serialVersionUID = -111847945879678350L;
 	private final Object request;
 
