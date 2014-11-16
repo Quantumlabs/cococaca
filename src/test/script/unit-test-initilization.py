@@ -28,15 +28,14 @@ if __name__ == '__main__':
         return_code = initialize_db_for_java_unit_test()
     elif args[0] == '--uninit':
         return_code = uninitialize_db_for_java_unit_test()
-	print "Successfully un-initialize."
     else:
         user()
         sys.exit(1)
 	sys.exit(return_code)
     if return_code == 0:
-        print "Operation completed."
+        print "************************************************************\nDatabase initialization has been done successfully!\n************************************************************"
         sys.exit(0)
     else:
-        print "Operation failed."
+        print "************************************************************\nDatabase initialization has been failed!\n************************************************************"
         sys.exit(1)
     
