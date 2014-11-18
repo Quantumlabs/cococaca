@@ -12,10 +12,12 @@ public class Parameters {
 	// @start Resources locators
 	public static final String URL_REST_RESOURCE_PREFIX = "/Resource";
 	public static final String URL_STATIC_HTML_PREFIX = "/static";
-	public static final String URL_SUBSCRIBER_SINGULAR_LOCATOR = "Subscriber";
-	public static final String URL_SUBSCRIBER_PLURAL_LOCATOR = "Subscribers";
+	public static final String URL_SUBSCRIBER_SINGULAR_LOCATOR = "User";
+	public static final String URL_SUBSCRIBER_PLURAL_LOCATOR = "Users";
 	public static final String URL_POST_SINGULAR_LOCATOR = "Post";
 	public static final String URL_POST_PLURAL_LOCATOR = "Posts";
+	public static final String URL_AUTHORIZATION = "Authorization";
+
 	// @end Resources locators
 
 	// @start configuration attributes
@@ -42,4 +44,6 @@ public class Parameters {
 	public static final long SVLT_PIC_UPLDR_SIZE_MAX = 30 * _1M;
 
 	public static final String FRONT_END_HTML_NEW_POST_FIELD = "img_content";
+
+	public static final String HTTP_SESSION_ATTRIBUTE_SUBSCRIBER_KEY = "_subscriber_key_string";
 }

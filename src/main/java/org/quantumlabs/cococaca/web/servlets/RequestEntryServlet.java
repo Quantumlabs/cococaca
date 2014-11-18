@@ -4,6 +4,7 @@
 package org.quantumlabs.cococaca.web.servlets;
 
 import java.io.IOException;
+import java.io.Writer;
 import java.util.function.BiFunction;
 
 import javax.servlet.ServletException;
@@ -30,76 +31,85 @@ public class RequestEntryServlet extends HttpServlet {
 	}
 
 	@Override
-	public void doGet(HttpServletRequest req, HttpServletResponse resp)
-			throws ServletException, IOException {
-		doHandlerOperation(
-				(restRequest, httpResponse) -> {
-					retrieveRequestHandler(restRequest).get(restRequest,
-							new HTTPServletResponseBasedCallBack(httpResponse));
-					return null;
-				}, req, resp);
+	public void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+		doHandlerOperation((restRequest, httpResponse) -> {
+			retrieveRequestHandler(restRequest).get(restRequest, new HTTPServletResponseBasedCallBack(httpResponse));
+			return null;
+		}, req, resp);
 	}
 
-	private void handleMalforedRequestFound(MalformedRequestException e,
-			HttpServletRequest req, HttpServletResponse resp) {
+	private void handleMalforedRequestFound(MalformedRequestException e, HttpServletRequest req,
+			HttpServletResponse resp) {
+		try (Writer writer = resp.getWriter()) {
+			writer.write(String.format("No handler exists %s", req.getRequestURI()));
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		}
 		resp.setStatus(403);
 	}
 
 	@Override
-	public void doPost(HttpServletRequest req, HttpServletResponse resp)
-			throws ServletException, IOException {
-		doHandlerOperation(
-				(restRequest, httpResponse) -> {
-					retrieveRequestHandler(restRequest).post(restRequest,
-							new HTTPServletResponseBasedCallBack(httpResponse));
-					return null;
-				}, req, resp);
+	public void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+		doHandlerOperation((restRequest, httpResponse) -> {
+			retrieveRequestHandler(restRequest).post(restRequest, new HTTPServletResponseBasedCallBack(httpResponse));
+			return null;
+		}, req, resp);
 
 	}
 
-	public void doHandlerOperation(
-			BiFunction<RESTRequest, HttpServletResponse, Void> hanlder,
-			HttpServletRequest req, HttpServletResponse resp) {
+	public void doHandlerOperation(BiFunction<RESTRequest, HttpServletResponse, Void> hanlder, HttpServletRequest req,
+			HttpServletResponse resp) {
 		try {
 			hanlder.apply(requestBuilder.build(req), resp);
 		} catch (MalformedRequestException e) {
 			handleMalforedRequestFound(e, req, resp);
 		} catch (HTTPParameterMissingException e) {
-			Helper.logError("Missing required parameter", e);
-			resp.setStatus(402);
+			handleParameterMissing(e, req, resp);
+		} catch (Exception e) {
+			Helper.logError(e);
+			try (Writer writer = resp.getWriter()) {
+				writer.write("server-500");
+				writer.close();
+			} catch (IOException e1) {
+				// Ignore
+			}
+			resp.setStatus(500);
 		}
 	}
 
-	private IResourceHandler retrieveRequestHandler(RESTRequest restRequest)
-			throws MalformedRequestException {
-		IResourceHandler handler = TXNManager.getInstance().getResourceRouter()
-				.retrieveResourceHandler(restRequest);
+	private void handleParameterMissing(HTTPParameterMissingException e, HttpServletRequest req,
+			HttpServletResponse resp) {
+		Helper.logError("Missing required parameter", e);
+		try (Writer writer = resp.getWriter()) {
+			writer.write(String.format("None existing parameter %s", e.getMessage()));
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		}
+		resp.setStatus(402);
+	}
+
+	private IResourceHandler retrieveRequestHandler(RESTRequest restRequest) throws MalformedRequestException {
+		IResourceHandler handler = TXNManager.getInstance().getResourceRouter().retrieveResourceHandler(restRequest);
 		if (handler == null) {
-			throw new MalformedRequestException(restRequest.getURL(),
-					restRequest);
+			throw new MalformedRequestException(restRequest.getURL(), restRequest);
 		} else {
 			return handler;
 		}
 	}
 
 	@Override
-	public void doPut(HttpServletRequest req, HttpServletResponse resp)
-			throws ServletException, IOException {
-		doHandlerOperation(
-				(restRequest, httpResponse) -> {
-					retrieveRequestHandler(restRequest).put(restRequest,
-							new HTTPServletResponseBasedCallBack(httpResponse));
-					return null;
-				}, req, resp);
+	public void doPut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+		doHandlerOperation((restRequest, httpResponse) -> {
+			retrieveRequestHandler(restRequest).put(restRequest, new HTTPServletResponseBasedCallBack(httpResponse));
+			return null;
+		}, req, resp);
 	}
 
 	@Override
-	public void doDelete(HttpServletRequest req, HttpServletResponse resp)
-			throws ServletException, IOException {
+	public void doDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		RESTRequest restRequest = requestBuilder.build(req);
 		try {
-			retrieveRequestHandler(restRequest).delete(restRequest,
-					new HTTPServletResponseBasedCallBack(resp));
+			retrieveRequestHandler(restRequest).delete(restRequest, new HTTPServletResponseBasedCallBack(resp));
 		} catch (MalformedRequestException e) {
 			handleMalforedRequestFound(e, req, resp);
 		}

@@ -21,6 +21,8 @@ import org.quantumlabs.cococaca.backend.service.persistence.model.ISubscriberKey
 import org.quantumlabs.cococaca.backend.service.persistence.model.ISubscriberKeyImpl;
 import org.quantumlabs.cococaca.backend.service.persistence.model.Post;
 import org.quantumlabs.cococaca.backend.service.preference.Parameters;
+import org.quantumlabs.cococaca.backend.transaction.authorization.SessionBasedAuthorizationContext;
+import org.quantumlabs.cococaca.backend.transaction.authorization.SessionBasedAuthenticationManager;
 import org.quantumlabs.cococaca.backend.transaction.response.responseentity.PostCreatitionResponse;
 import org.quantumlabs.cococaca.backend.transaction.response.responseentity.PostResponse;
 import org.quantumlabs.cococaca.web.HTTPParameterMissingException;
@@ -46,26 +48,24 @@ public class PostHandler implements IResourceHandler {
 
 	@Override
 	public void get(RESTRequest request, IResourceHandlerCallBack callBack) {
+		HttpServletRequest httpRequest = (HttpServletRequest) request.getAttachment();
 		switch (request.getQuantifier()) {
 		case SINGULAR:
 			IPostKey postKey = null;
-			Post post = TXNManager.getInstance().getPersistence()
-					.fetchPost(postKey);
+			Post post = TXNManager.getInstance().getPersistence().fetchPost(postKey);
 			callBack.onResouceHandlingCompleted(request, new PostResponse(post));
 			break;
 		case PLURAL:
-			// Cache client token/key?
-			String clientToken = "3";
+			SessionBasedAuthorizationContext authenticationContext = new SessionBasedAuthorizationContext(
+					httpRequest.getSession());
+			String clientToken = authenticationContext.getClientToken();
 			ISubscriberKey subscriberKey = new ISubscriberKeyImpl(clientToken);
-			Post[] posts = TXNManager.getInstance().getPersistence()
-					.fetchPostsForSubscriber(subscriberKey);
-			callBack.onResouceHandlingCompleted(request,
-					new PostResponse(posts));
+			Post[] posts = TXNManager.getInstance().getPersistence().fetchPostsForSubscriber(subscriberKey);
+			callBack.onResouceHandlingCompleted(request, new PostResponse(posts));
 			break;
 		default:
 			Helper.assertError();
 		}
-
 	}
 
 	private DiskFileItemFactory factory;
@@ -84,8 +84,7 @@ public class PostHandler implements IResourceHandler {
 
 	@Override
 	public void post(RESTRequest request, IResourceHandlerCallBack callBack) {
-		HttpServletRequest httpRequest = (HttpServletRequest) request
-				.getAttachment();
+		HttpServletRequest httpRequest = (HttpServletRequest) request.getAttachment();
 		try {
 			List<FileItem> files = getFileUpload().parseRequest(httpRequest);
 			// The post and the file content share the same key
@@ -95,8 +94,7 @@ public class PostHandler implements IResourceHandler {
 			post.setDescription(extractDescription(files));
 			post.setAuthorKey(new ISubscriberKeyImpl(extractAuthorKey(files)));
 			TXNManager.getInstance().getPersistence().storePost(post);
-			callBack.onResouceHandlingCompleted(request,
-					new PostCreatitionResponse(post));
+			callBack.onResouceHandlingCompleted(request, new PostCreatitionResponse(post));
 		} catch (FileUploadException | IOException e) {
 			Helper.logError(e);
 			callBack.onResourceHandlingFailed(request, null);
@@ -105,8 +103,7 @@ public class PostHandler implements IResourceHandler {
 
 	// Currently, client send client ID directly, don't store ID in session
 	// based on REST constrain.
-	private String extractAuthorKey(List<FileItem> files)
-			throws HTTPParameterMissingException {
+	private String extractAuthorKey(List<FileItem> files) throws HTTPParameterMissingException {
 		String authorKey = null;
 		for (FileItem item : files) {
 			if (item.isFormField()) {
@@ -116,8 +113,7 @@ public class PostHandler implements IResourceHandler {
 				}
 			}
 		}
-		Helper.validateHTTPParameterNotNull(
-				"Post author key should not be null.", authorKey);
+		Helper.validateHTTPParameterNotNull("Post author key should not be null.", authorKey);
 		return authorKey;
 	}
 
@@ -128,8 +124,7 @@ public class PostHandler implements IResourceHandler {
 				fileContentKey = storeFileAndRetrieveKey(item);
 			}
 		}
-		Helper.assertNotNull("Post file contentKey should not be null.",
-				fileContentKey);
+		Helper.assertNotNull("Post file contentKey should not be null.", fileContentKey);
 		return fileContentKey;
 	}
 
@@ -143,8 +138,7 @@ public class PostHandler implements IResourceHandler {
 				}
 			}
 		}
-		Helper.assertNotNull("Post description should not be null.",
-				description);
+		Helper.assertNotNull("Post description should not be null.", description);
 		return description;
 	}
 
@@ -154,12 +148,10 @@ public class PostHandler implements IResourceHandler {
 		String contentType = item.getContentType();
 		boolean isInMemory = item.isInMemory();
 		long sizeInBytes = item.getSize();
-		Helper.assertTrue(Parameters.FRONT_END_HTML_NEW_POST_FIELD
-				.equals(fieldName));
+		Helper.assertTrue(Parameters.FRONT_END_HTML_NEW_POST_FIELD.equals(fieldName));
 		// Check file content type, img/jpeg etv.
 		// Helper.assertTrue("multipart/form-data".equals(contentType));
-		String key = TXNManager.getInstance().getPersistence()
-				.write(item.getInputStream());
+		String key = TXNManager.getInstance().getPersistence().write(item.getInputStream());
 		item.getInputStream().close();
 		return key;
 	}

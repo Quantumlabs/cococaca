@@ -40,6 +40,7 @@ public class Subscriber {
 
 	public Subscriber(ISubscriberKey key) {
 		this.key = key;
+		this.gender = Gender.WTF;
 	}
 
 	@Override

@@ -25,16 +25,12 @@ public class Helper {
 
 	private static class DefaultResourceRequestDecorator {
 		private String decorate(String rawRequest) {
-			StringBuilder sb = new StringBuilder(
-					Parameters.URL_REST_RESOURCE_PREFIX.length()
-							+ rawRequest.length());
-			return sb.append(Parameters.URL_REST_RESOURCE_PREFIX)
-					.append(rawRequest).toString();
+			StringBuilder sb = new StringBuilder(Parameters.URL_REST_RESOURCE_PREFIX.length() + rawRequest.length());
+			return sb.append(Parameters.URL_REST_RESOURCE_PREFIX).append(rawRequest).toString();
 		}
 
 		private String undecorate(String decoratedRequest) {
-			return decoratedRequest
-					.substring(Parameters.URL_REST_RESOURCE_PREFIX.length());
+			return decoratedRequest.substring(Parameters.URL_REST_RESOURCE_PREFIX.length());
 		}
 	}
 
@@ -47,8 +43,7 @@ public class Helper {
 	 * */
 	public static String getRelativeURL(HttpServletRequest request) {
 		String contextPath = ((HttpServletRequest) request).getContextPath();
-		return ((HttpServletRequest) request).getRequestURI().substring(
-				contextPath.length());
+		return ((HttpServletRequest) request).getRequestURI().substring(contextPath.length());
 	}
 
 	public static void assertNotNull(Object o) {
@@ -87,8 +82,10 @@ public class Helper {
 		if (e.getCause() != null) {
 			return appendRootCause(e.getCause());
 		} else {
-			String causeStackTrace = buildStackTrace(e.getCause());
-			builder.append("Caused by --->\n");
+			builder.append("Caused by --->");
+			builder.append(e);
+			builder.append("\n");
+			String causeStackTrace = buildStackTrace(e);
 			builder.append(causeStackTrace);
 			return builder.toString();
 		}
@@ -114,14 +111,17 @@ public class Helper {
 	}
 
 	// Only use for validating HTTP parameters, <strong></strong>
-	public static void validateHTTPParameterNotNull(String message, Object o)
-			throws HTTPParameterMissingException {
+	public static void validateHTTPParameterNotNull(String message, Object o) throws HTTPParameterMissingException {
 		if (o == null) {
-			throw new HTTPParameterMissingException(message);
+			throw new HTTPParameterMissingException(message == null ? "" : message);
 		}
 	}
 
 	public static void assertError() {
 		throw new AssertionError();
+	}
+
+	public static void validateHTTPParameterNotNull(String userEmail) {
+		validateHTTPParameterNotNull(null, userEmail);
 	}
 }
