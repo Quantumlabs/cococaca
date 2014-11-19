@@ -68,9 +68,9 @@ primary_color_map[18] = "#9e9e9e";
 var primary_color_state = -1;
 
 _URL_COMMENTED_USER_FORMAT = "post/commented?ID={0}";
-_URL_CDN_AVATAR_FORMAT = "cdn/avatar?ID={0}";
-_URL_POSTS_BATCH_RETRIEVE_STATIC = "Post/";
-_URL_CDN_CONTENT_IMG_FORMAT = "cdn/img?uuid={0}"
+_URL_CDN_AVATAR_FORMAT = "../Img/{0}";
+_URL_POSTS_BATCH_RETRIEVE_STATIC = "../Post/";
+_URL_CDN_CONTENT_IMG_FORMAT = "../Img/{0}"
 
 /**
  * ****************************@ Globe variables definition done.
@@ -213,10 +213,11 @@ function build_post_item(post_info) {
 	return row
 }
 function create_posts() {
-	var posts = $.ajax({
+	$.ajax({
 		url : _URL_POSTS_BATCH_RETRIEVE_STATIC,
 		success : function(data, status, xhr) {
 			var main_container = $("div[name=main-container]");
+			var posts = eval(data);
 			for (var i = 0; i < posts.length; i++) {
 				post_info = posts[i];
 				build_post_item(post_info).appendTo(main_container);
@@ -282,7 +283,7 @@ function start_danmuku() {
 }
 
 $(document).ready(function() {
-	_DEBUG = true;
+	_DEBUG = false;
 	_LOG_ON = false;
 	init();
 	if (_DEBUG) {

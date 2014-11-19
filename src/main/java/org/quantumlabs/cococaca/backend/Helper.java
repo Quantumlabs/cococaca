@@ -124,4 +124,8 @@ public class Helper {
 	public static void validateHTTPParameterNotNull(String userEmail) {
 		validateHTTPParameterNotNull(null, userEmail);
 	}
+
+	public static void assertUnsupportedOperation() {
+		throw new UnsupportedOperationException();
+	}
 }

@@ -18,7 +18,6 @@ public class PostResponse implements JsonResponse {
 
 	public PostResponse(Post... posts) {
 		Helper.assertNotNull(posts);
-		Helper.assertTrue(posts.length > 0);
 		this.posts = posts;
 	}
 

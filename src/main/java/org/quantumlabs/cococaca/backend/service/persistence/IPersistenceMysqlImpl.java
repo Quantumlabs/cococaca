@@ -476,4 +476,48 @@ public class IPersistenceMysqlImpl implements IPersistence {
 	public boolean isSubscriberExisting(String userName) {
 		return performOperation(IS_SUBSCRIBER_EXISTING, userName);
 	}
+
+	private static class Followship {
+		final ISubscriberKey follower;
+		final ISubscriberKey followee;
+
+		Followship(ISubscriberKey follower, ISubscriberKey followee) {
+			this.follower = follower;
+			this.followee = followee;
+		}
+	}
+
+	private static IDatabaseOperation<Followship, Void> CREATE_FOLLOWSHIP = (connection, followship) -> {
+		String sql = "INSERT INTO TC_FOLLOWSHIP (FOLLOWER_ID, FOLLOWEE_ID) VALUES (?,?)";
+		try (PreparedStatement statement = connection.prepareStatement(sql)) {
+			statement.setString(1, followship.follower.get());
+			statement.setString(2, followship.followee.get());
+			statement.execute();
+			return null;
+		}
+	};
+
+	@Override
+	public Void follow(ISubscriberKey followerKey, ISubscriberKey followeeKey) {
+		Followship followship = new Followship(followerKey, followeeKey);
+		performOperation(CREATE_FOLLOWSHIP, followship);
+		return null;
+	}
+
+	private static IDatabaseOperation<Followship, Void> DISCARD_FOLLOWSHIP = (connection, followship) -> {
+		String sql = "DELETE FROM TC_FOLLOWSHIP WHERE FOLLOWER_ID, FOLLOWEE_ID) VALUES (?,?)";
+		try (PreparedStatement statement = connection.prepareStatement(sql)) {
+			statement.setString(1, followship.follower.get());
+			statement.setString(2, followship.followee.get());
+			statement.execute();
+			return null;
+		}
+	};
+
+	@Override
+	public Void unfollow(ISubscriberKey followerKey, ISubscriberKey followeeKey) {
+		Followship followship = new Followship(followerKey, followeeKey);
+		performOperation(DISCARD_FOLLOWSHIP, followship);
+		return null;
+	}
 }

@@ -36,4 +36,8 @@ public interface IPersistence {
 	ISubscriberKey authorize(Credential credential);
 
 	boolean isSubscriberExisting(String userName);
+
+	Void follow(ISubscriberKey followerKey, ISubscriberKey followeeKey);
+
+	Void unfollow(ISubscriberKey followerKey, ISubscriberKey followeeKey);
 }

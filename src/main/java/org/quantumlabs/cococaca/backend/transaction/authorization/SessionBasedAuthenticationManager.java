@@ -20,7 +20,7 @@ public class SessionBasedAuthenticationManager implements IAuthorizationManager 
 		if (key == null) {
 			return Optional.empty();
 		} else {
-			session.setAttribute(Parameters.HTTP_SESSION_ATTRIBUTE_SUBSCRIBER_KEY, key);
+			session.setAttribute(Parameters.HTTP_SESSION_ATTRIBUTE_SUBSCRIBER_KEY, key.get());
 			return Optional.of(key);
 		}
 	}

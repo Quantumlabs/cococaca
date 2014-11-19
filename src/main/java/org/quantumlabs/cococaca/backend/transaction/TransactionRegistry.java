@@ -4,6 +4,7 @@ import org.quantumlabs.cococaca.backend.BackEnd;
 import org.quantumlabs.cococaca.backend.BackEnd.StartCallBack;
 import org.quantumlabs.cococaca.backend.service.dispatching.ResourceRouter;
 import org.quantumlabs.cococaca.backend.transaction.handler.AuthorizationHandler;
+import org.quantumlabs.cococaca.backend.transaction.handler.FollowshipHandler;
 import org.quantumlabs.cococaca.backend.transaction.handler.PostHandler;
 import org.quantumlabs.cococaca.backend.transaction.handler.SubscriberHandler;
 
@@ -24,6 +25,7 @@ public class TransactionRegistry implements StartCallBack {
 		router.register(new SubscriberHandler());
 		router.register(new PostHandler());
 		router.register(new AuthorizationHandler());
+		router.register(new FollowshipHandler());
 	}
 
 	@Override

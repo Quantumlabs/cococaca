@@ -24,9 +24,8 @@ public class RESTRequest {
 	private List<ResourceFilter> filters;
 	private Object attachment;
 	private Optional<String> id;
-	private static final Pattern URL_WITHOUT_RESOURCE_PREFIX = Pattern
-			.compile(String.format("%s(.*)",
-					Parameters.URL_REST_RESOURCE_PREFIX));
+	private static final Pattern URL_WITHOUT_RESOURCE_PREFIX = Pattern.compile(String.format("%s(.*)",
+			Parameters.URL_REST_RESOURCE_PREFIX));
 
 	private RESTRequest(HttpServletRequest request) {
 		this.request = request;
@@ -43,9 +42,8 @@ public class RESTRequest {
 		String urlWithPrefix = Helper.getRelativeURL(request);
 		Matcher matcher = URL_WITHOUT_RESOURCE_PREFIX.matcher(urlWithPrefix);
 		Helper.assertTrue(
-				String.format(
-						"Relative url %s request doesn't match \"/Resource/....\" pattern",
-						urlWithPrefix), matcher.matches());
+				String.format("Relative url %s request doesn't match \"/Resource/....\" pattern", urlWithPrefix),
+				matcher.matches());
 		return matcher.group(1);
 	}
 
@@ -117,7 +115,7 @@ public class RESTRequest {
 
 	public void setResourceIdentifier(String id) {
 		if (id != null) {
-			Optional.of(id);
+			this.id = Optional.of(id);
 		}
 	}
 }

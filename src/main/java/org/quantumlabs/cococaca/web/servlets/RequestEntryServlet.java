@@ -13,6 +13,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.quantumlabs.cococaca.backend.Helper;
+import org.quantumlabs.cococaca.backend.service.Logger;
 import org.quantumlabs.cococaca.backend.service.TXNManager;
 import org.quantumlabs.cococaca.backend.service.dispatching.DefaultResourceRoutingPolicy;
 import org.quantumlabs.cococaca.backend.service.dispatching.IResourceHandler;
@@ -24,6 +25,7 @@ import org.quantumlabs.cococaca.web.HTTPParameterMissingException;
 public class RequestEntryServlet extends HttpServlet {
 	private static final long serialVersionUID = -5412265740476356268L;
 	private RestRequestBuilder requestBuilder;
+	private static Logger LOG = Logger.getLogger(RequestEntryServlet.class);
 
 	public RequestEntryServlet() {
 		requestBuilder = new RestRequestBuilder();
@@ -60,21 +62,23 @@ public class RequestEntryServlet extends HttpServlet {
 	public void doHandlerOperation(BiFunction<RESTRequest, HttpServletResponse, Void> hanlder, HttpServletRequest req,
 			HttpServletResponse resp) {
 		try {
+			LOG.trace(String.format("Request entry %s", req.getRequestURI()));
 			hanlder.apply(requestBuilder.build(req), resp);
 		} catch (MalformedRequestException e) {
 			handleMalforedRequestFound(e, req, resp);
 		} catch (HTTPParameterMissingException e) {
 			handleParameterMissing(e, req, resp);
-		} catch (Exception e) {
-			Helper.logError(e);
-			try (Writer writer = resp.getWriter()) {
-				writer.write("server-500");
-				writer.close();
-			} catch (IOException e1) {
-				// Ignore
-			}
-			resp.setStatus(500);
 		}
+//		} catch (Exception e) {
+//			Helper.logError(e);
+//			resp.setStatus(500);
+//			try (Writer writer = resp.getWriter()) {
+//				writer.write("server-500");
+//				writer.close();
+//			} catch (IOException e1) {
+//				// Ignore
+//			}
+//		}
 	}
 
 	private void handleParameterMissing(HTTPParameterMissingException e, HttpServletRequest req,

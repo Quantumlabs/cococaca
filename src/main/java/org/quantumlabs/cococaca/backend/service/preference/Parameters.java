@@ -16,6 +16,7 @@ public class Parameters {
 	public static final String URL_SUBSCRIBER_PLURAL_LOCATOR = "Users";
 	public static final String URL_POST_SINGULAR_LOCATOR = "Post";
 	public static final String URL_POST_PLURAL_LOCATOR = "Posts";
+	public static final String URL_FOLLOWSHIP_LOCATOR = "Followship";
 	public static final String URL_AUTHORIZATION = "Authorization";
 
 	// @end Resources locators

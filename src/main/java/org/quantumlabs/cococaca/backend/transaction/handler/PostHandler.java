@@ -2,6 +2,7 @@ package org.quantumlabs.cococaca.backend.transaction.handler;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -51,7 +52,9 @@ public class PostHandler implements IResourceHandler {
 		HttpServletRequest httpRequest = (HttpServletRequest) request.getAttachment();
 		switch (request.getQuantifier()) {
 		case SINGULAR:
-			IPostKey postKey = null;
+			Optional<String> resourceIdentifier = request.getResourceIdentifier();
+			Helper.assertTrue(resourceIdentifier.isPresent());
+			IPostKey postKey = new IPostKeyImpl(resourceIdentifier.get());
 			Post post = TXNManager.getInstance().getPersistence().fetchPost(postKey);
 			callBack.onResouceHandlingCompleted(request, new PostResponse(post));
 			break;
@@ -86,35 +89,22 @@ public class PostHandler implements IResourceHandler {
 	public void post(RESTRequest request, IResourceHandlerCallBack callBack) {
 		HttpServletRequest httpRequest = (HttpServletRequest) request.getAttachment();
 		try {
+			SessionBasedAuthorizationContext authenticationContext = new SessionBasedAuthorizationContext(
+					httpRequest.getSession());
+			Helper.assertNotEmtryString(authenticationContext.getClientToken());
 			List<FileItem> files = getFileUpload().parseRequest(httpRequest);
 			// The post and the file content share the same key
 			String sharedKey = storeFile(files);
 			Post post = new Post(new IPostKeyImpl(sharedKey));
 			post.setContentKey(new IContentKeyImpl(sharedKey));
 			post.setDescription(extractDescription(files));
-			post.setAuthorKey(new ISubscriberKeyImpl(extractAuthorKey(files)));
+			post.setAuthorKey(new ISubscriberKeyImpl(authenticationContext.getClientToken()));
 			TXNManager.getInstance().getPersistence().storePost(post);
 			callBack.onResouceHandlingCompleted(request, new PostCreatitionResponse(post));
 		} catch (FileUploadException | IOException e) {
 			Helper.logError(e);
 			callBack.onResourceHandlingFailed(request, null);
 		}
-	}
-
-	// Currently, client send client ID directly, don't store ID in session
-	// based on REST constrain.
-	private String extractAuthorKey(List<FileItem> files) throws HTTPParameterMissingException {
-		String authorKey = null;
-		for (FileItem item : files) {
-			if (item.isFormField()) {
-				String fieldName = item.getFieldName();
-				if (Parameters.SVLT_POST_AHTOR_ID.equals(fieldName)) {
-					authorKey = item.getString();
-				}
-			}
-		}
-		Helper.validateHTTPParameterNotNull("Post author key should not be null.", authorKey);
-		return authorKey;
 	}
 
 	private String storeFile(List<FileItem> files) throws IOException {
