@@ -9,6 +9,16 @@ function card_content_on_click(e) {
 
 	alert("相对客户端的坐标：\n" + "x = " + x + "\n" + "y = " + y + "\n\n"
 			+ "相对屏幕的坐标：\n" + "x = " + x1 + "\n" + "y = " + y1);
+	var comment_div = $(sformat(
+			"<div><form method='POST' action='../Danmukus'><input type='text' name='content'/>"
+					+ "<input type='text'  value='{0}' name='authorID'/>"
+					+ "<input type='text'  value='{1}' name='postID'/>"
+					+ "<input type='submit'  value='Danmuku' /></form></div>",
+			"dummy author id", "dummy post id"));
+	comment_div.style = sformat(
+			"position:relative; top:{0}, left:{1}; z-index:5; background:#000000;width:100; height:100",
+			x, y);
+	//comment_div.appendTo(eve.srcElement);
 }
 
 log_debug = function() {
@@ -94,6 +104,8 @@ function fill_backgroud_color_forall_card_content() {
 
 /**
  * Create commented users inside #show-viewer for specified post.
+ * 
+ * @deprecated
  */
 function create_viewers_in_post(post_ID, user_IDs) {
 	var post_div = $(sformat("div[id={0}]", post_ID));
@@ -178,9 +190,9 @@ function build_card_foot(post_info) {
 	card_foot_row_content_description.appendTo(card_foot);
 
 	var card_foot_row_show_viewer = $("<div name=\"show-viewer\" class=\"row\"></div>");
-	var script = $("<script> load_commented_users(\"{0}\")</script>",
-			post_info.postID)
-	script.appendTo(card_foot_row_show_viewer);
+	// var script = $("<script> load_commented_users(\"{0}\")</script>",
+	// post_info.postID)
+	// script.appendTo(card_foot_row_show_viewer);
 	card_foot_row_show_viewer.appendTo(card_foot);
 
 	var card_foot_row_comment_text_input = $("<div class=\"form-group\" name=\"comment-text-input\"></div>");

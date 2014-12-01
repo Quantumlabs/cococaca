@@ -69,4 +69,9 @@ public class HTTPServletResponseBasedCallBack implements
 		// TODO Auto-generated method stub
 
 	}
+
+	@Override
+	public HttpServletResponse getAttachment() {
+		return resp;
+	}
 }

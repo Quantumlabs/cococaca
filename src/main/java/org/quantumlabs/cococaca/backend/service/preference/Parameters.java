@@ -18,6 +18,8 @@ public class Parameters {
 	public static final String URL_POST_PLURAL_LOCATOR = "Posts";
 	public static final String URL_FOLLOWSHIP_LOCATOR = "Followship";
 	public static final String URL_AUTHORIZATION = "Authorization";
+	public static final String URL_IMG_LOCATOR = "Img";
+	public static final String URL_DANMUKU_LOCATOR = "Danmukus";
 
 	// @end Resources locators
 

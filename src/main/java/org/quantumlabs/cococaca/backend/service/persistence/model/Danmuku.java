@@ -6,6 +6,7 @@ public class Danmuku {
 	private String content;
 	// Epoch time
 	private long timeStamp;
+	private String postID;
 
 	public String getID() {
 		return ID;
@@ -37,5 +38,13 @@ public class Danmuku {
 
 	public void setTimeStamp(long timeStamp) {
 		this.timeStamp = timeStamp;
+	}
+
+	public void setPostID(String postID) {
+		this.postID = postID;
+	}
+
+	public String getPostID() {
+		return postID;
 	}
 }

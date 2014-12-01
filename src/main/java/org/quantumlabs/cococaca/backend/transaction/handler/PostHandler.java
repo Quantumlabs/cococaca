@@ -49,6 +49,7 @@ public class PostHandler implements IResourceHandler {
 
 	@Override
 	public void get(RESTRequest request, IResourceHandlerCallBack callBack) {
+
 		HttpServletRequest httpRequest = (HttpServletRequest) request.getAttachment();
 		switch (request.getQuantifier()) {
 		case SINGULAR:

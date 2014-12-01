@@ -19,16 +19,17 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.List;
-import java.util.ArrayList;
+import java.util.function.Function;
 
 import org.quantumlabs.cococaca.backend.Helper;
-import org.quantumlabs.cococaca.backend.service.persistence.IPersistenceMysqlImpl.IDatabaseOperation;
+import org.quantumlabs.cococaca.backend.service.persistence.model.Danmuku;
 import org.quantumlabs.cococaca.backend.service.persistence.model.Gender;
 import org.quantumlabs.cococaca.backend.service.persistence.model.IContentKeyImpl;
 import org.quantumlabs.cococaca.backend.service.persistence.model.IPostKey;
@@ -461,17 +462,6 @@ public class IPersistenceMysqlImpl implements IPersistence {
 		return performOperation(AUTHORIZE_USER, credential);
 	}
 
-	private static IDatabaseOperation<String, Boolean> IS_SUBSCRIBER_EXISTING = (connection, userName) -> {
-		String sql = "SELECT ID FROM T_SUBSCRIBER WHERE NAME=?";
-		try (PreparedStatement statement = connection.prepareStatement(sql)) {
-			statement.setString(1, userName);
-			ResultSet rs = statement.executeQuery();
-			boolean existing = rs.next();
-			Helper.assertTrue(String.format("User name %s should not be duplicated in DB", userName), !rs.next());
-			return existing;
-		}
-	};
-
 	@Override
 	public boolean isSubscriberExisting(String userName) {
 		return performOperation(IS_SUBSCRIBER_EXISTING, userName);
@@ -519,5 +509,82 @@ public class IPersistenceMysqlImpl implements IPersistence {
 		Followship followship = new Followship(followerKey, followeeKey);
 		performOperation(DISCARD_FOLLOWSHIP, followship);
 		return null;
+	}
+
+	private static IDatabaseOperation<String, Boolean> IS_SUBSCRIBER_EXISTING = (connection, userName) -> {
+		String sql = "SELECT ID FROM T_SUBSCRIBER WHERE NAME=?";
+		try (PreparedStatement statement = connection.prepareStatement(sql)) {
+			statement.setString(1, userName);
+			ResultSet rs = statement.executeQuery();
+			boolean existing = rs.next();
+			Helper.assertTrue(String.format("User name %s should not be duplicated in DB", userName), !rs.next());
+			return existing;
+		}
+	};
+
+	private static class OutputStreamHandle {
+		Function<InputStream, Void> callBack;
+		String key;
+	}
+
+	private static IDatabaseOperation<OutputStreamHandle, Void> READ_BINARY_FROM_DB = (connection, handle) -> {
+		String sql = "SELECT BIN_DATA FROM T_FILE_STORE WHERE ID = ?";
+		try (PreparedStatement statement = connection.prepareStatement(sql)) {
+			statement.setString(1, handle.key);
+			ResultSet rs = statement.executeQuery();
+			if (rs.next()) {
+				InputStream imgStream = rs.getBinaryStream(1);
+				handle.callBack.apply(imgStream);
+			}
+			Helper.assertTrue(String.format("More than 1 IMG fetch out by key %s ", handle.key), !rs.next());
+			return null;
+		}
+	};
+
+	@Override
+	public void read(String resourceID, Function<InputStream, Void> callBack) {
+		OutputStreamHandle outHandle = new OutputStreamHandle();
+		outHandle.callBack = callBack;
+		outHandle.key = resourceID;
+		performOperation(READ_BINARY_FROM_DB, outHandle);
+	}
+
+	@Override
+	public Danmuku[] fetchDanmukuByPostID(IPostKey postKey) {
+		return performOperation((connection, postKeyParam) -> {
+			String sql = "SELECT AUTHOR_ID, CONTENT, DATESTAMP WHERE POST_ID = ?";
+			try (PreparedStatement statement = connection.prepareStatement(sql)) {
+				statement.setString(1, postKeyParam.get());
+				ResultSet rs = statement.executeQuery();
+				List<Danmuku> danmukus = new ArrayList<>();
+				while (rs.next()) {
+					Danmuku danmuku = new Danmuku();
+					danmuku.setAuthorID(rs.getString(1));
+					danmuku.setContent(rs.getString(2));
+					danmuku.setTimeStamp(Long.valueOf(rs.getString(3)));
+					danmuku.setPostID(rs.getString(4));
+					danmukus.add(danmuku);
+				}
+				return danmukus.toArray(new Danmuku[danmukus.size()]);
+			}
+		}, postKey);
+	}
+
+	@Override
+	public Void insertDanmukuForPost(IPostKey postKey, Danmuku... danmukus) {
+		return performOperation((connection, danmukusParam) -> {
+			String sql = "INSERT INTO T_DANMUKU values(author_id,content,datestamp,post_id) values(?,?,?,?)";
+			try (PreparedStatement statement = connection.prepareStatement(sql)) {
+				for (Danmuku danmuku : danmukusParam) {
+					statement.setString(1, danmuku.getAuthorID());
+					statement.setString(2, danmuku.getContent());
+					statement.setString(3, String.valueOf(System.currentTimeMillis()));
+					statement.setString(4, postKey.get());
+					statement.addBatch();
+				}
+				statement.execute();
+				return null;
+			}
+		}, danmukus);
 	}
 }

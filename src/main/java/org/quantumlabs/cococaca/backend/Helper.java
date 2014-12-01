@@ -1,6 +1,8 @@
 package org.quantumlabs.cococaca.backend;
 
 import java.util.Objects;
+import java.util.function.Function;
+import java.util.stream.Stream;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -127,5 +129,15 @@ public class Helper {
 
 	public static void assertUnsupportedOperation() {
 		throw new UnsupportedOperationException();
+	}
+
+	public static byte[] allocateBuffer() {
+		return new byte[1024];
+	}
+
+	public static <P, R> void map(Function<P, R> applier, P... params) {
+		for (P p : params) {
+			applier.apply(p);
+		}
 	}
 }

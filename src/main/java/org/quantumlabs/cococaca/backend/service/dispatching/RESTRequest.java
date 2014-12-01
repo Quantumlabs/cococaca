@@ -13,6 +13,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.quantumlabs.cococaca.backend.Helper;
 import org.quantumlabs.cococaca.backend.service.preference.Parameters;
@@ -24,6 +25,7 @@ public class RESTRequest {
 	private List<ResourceFilter> filters;
 	private Object attachment;
 	private Optional<String> id;
+	private HttpServletResponse response;
 	private static final Pattern URL_WITHOUT_RESOURCE_PREFIX = Pattern.compile(String.format("%s(.*)",
 			Parameters.URL_REST_RESOURCE_PREFIX));
 
